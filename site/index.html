@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biodiversity FDP</title>
+<meta name="description" content="Browse the Biodiversity FAIR Data Point: every way to get iNaturalist, GBIF, BHL, Plazi, UniProt, OpenStreetMap and GeoNames data.">
+<link rel="alternate" type="text/turtle" href="fdp/biodiversity-index/catalog.ttl">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/n3@2.13.8/browser/n3.min.js"></script>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <div class="logo">B</div>
+    <div><div class="brand-title" id="brand-title">Biodiversity FDP</div><div class="brand-sub" id="repo-label">FAIR Data Point browser</div></div>
+  </div>
+  <div class="nav" id="nav"></div>
+</div>
+
+<nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+<main id="view"><div class="loading"><div class="spinner"></div>Loading the FAIR Data Point…</div></main>
+<footer id="footer"></footer>
+
+<script src="app.js"></script>
+</body>
+</html>

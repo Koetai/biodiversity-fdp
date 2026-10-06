@@ -50,30 +50,22 @@ scripts/set-base.sh <org> <repo> [branch]      # rewrite every URI if the repo m
 
 CI runs `validate.py` on every push that touches `fdp/`.
 
-To keep the files readable by the viewer, follow these conventions:
+The viewer uses a full Turtle parser, so any valid Turtle works. The house style (one block per node, a "How to get it:" description on each distribution) is a convention, not a requirement.
 
-- Start each node's block in column 0 with a `:local-name`.
-- Make `dcat:dataset` and `dcat:distribution` the last predicate of their block.
-- Write literals on a single line.
+## Viewer (GitHub Pages)
 
-## Viewer
+`site/` is a static, public FDP browser: plain HTML and JS, no server.
+It fetches the index Turtle, follows `rdfs:seeAlso` to every sub-catalog, and parses everything in the browser with [N3.js](https://github.com/rdfjs/N3.js).
+You browse index → catalog → dataset → "ways to get it", and can filter by access method.
+Data services and `prov:wasDerivedFrom` links resolve across catalogs.
 
-`viewer/` is a self-contained Java 8+ JAR adapted from the AMC viewer.
-It offers an FDP browser (index → catalog → dataset → distributions, filterable by access method) and a Turtle editor that commits through GitHub OAuth Device Flow.
+- **Deploy:** `.github/workflows/pages.yml` validates the Turtle, then publishes `site/` together with `fdp/` on every push to `main`. Enable it once under *Settings → Pages → Source: GitHub Actions*. The site is then at `https://andrawaag.github.io/biodiversity-fdp/`, and the Turtle files are also served there as `text/turtle`.
+- **Editing:** each catalog has *Edit on GitHub* and *History* links. GitHub handles sign-in, and people without write access get a fork and a pull request automatically. No OAuth app or secret is needed.
+- **Other FDPs:** `?index=<url of an index catalog.ttl>` browses any FDP laid out the same way, as long as it is publicly readable.
+- **Local preview:**
 
-```bash
-cd viewer && ./build.sh
-cp config.properties.template config.properties   # set github.client_id to commit; browsing needs nothing
-java -jar fdp-viewer.jar
-```
+  ```bash
+  scripts/build-site.sh && python3 -m http.server -d _site 8000
+  ```
 
-Setting `local.root=..` in `config.properties` previews the local checkout without GitHub (read-only).
-
-Changes from the AMC version:
-
-- The server binds to loopback only and checks the Host and Origin headers, so other sites cannot use the signed-in token.
-- The wildcard CORS header is removed.
-- The OAuth scope is configurable (default `public_repo`), and the client secret is optional because Device Flow doesn't need one.
-- Base64 decoding and JSON parsing are fixed for files larger than a few KB.
-- The parser reads IRI media types, access methods and data services.
-- The UI is in English.
+The viewer derives the repository, branch and edit links from the index's own URIs, so `scripts/set-base.sh` is the only thing to run after renaming the repo.
