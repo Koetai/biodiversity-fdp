@@ -7,10 +7,10 @@
 @prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
 @prefix r3d:     <http://www.re3data.org/schema/3-0#> .
 @prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
-@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
-@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/inaturalist-fdp/> .
+@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/> .
 
-<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/inaturalist-fdp/>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/>
     a fdp:MetadataService, r3d:Repository ;
     dcterms:title "iNaturalist FAIR Data Point — Biodiversity FDP"@en ;
     dcterms:publisher :publisher-curator ;
@@ -23,7 +23,7 @@
     dcterms:description "Community-sourced, photo-vouchered observations of organisms and the iNaturalist taxonomy. Native access on inaturalist.org, plus the research-grade subset republished through GBIF (portal, API, AWS Parquet snapshots and the QLever RDF graph)."@en ;
     dcterms:publisher :publisher-inat ;
     dcat:landingPage <https://www.inaturalist.org> ;
-    dcat:themeTaxonomy <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#scheme> ;
+    dcat:themeTaxonomy <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods#scheme> ;
     dcat:keyword "citizen science"@en , "occurrence"@en , "observation"@en , "taxonomy"@en ;
     dcat:dataset :inat-observations , :inat-taxonomy .
 
@@ -112,9 +112,9 @@
     dcterms:modified "2026-10-06"^^xsd:date ;
     dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
     dcat:accessURL <https://www.gbif.org/dataset/50c9509d-22c7-4a22-a47d-8c48425ef4a7> ;
-    dcat:accessService <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-api> ;
+    dcat:accessService <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-api> ;
     prov:wasDerivedFrom :dist-obs-dwca ;
-    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
+    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
 
 :dist-obs-gbif-aws
     a dcat:Distribution ;
@@ -125,7 +125,7 @@
     dcat:mediaType <https://www.iana.org/assignments/media-types/application/vnd.apache.parquet> ;
     dcterms:format ft:PARQUET ;
     dcat:accessURL <https://registry.opendata.aws/gbif/> ;
-    dcat:accessService <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-s3-eu-central-1> ;
+    dcat:accessService <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-s3-eu-central-1> ;
     prov:wasDerivedFrom :dist-obs-gbif .
 
 :dist-obs-gbif-qlever
@@ -135,7 +135,7 @@
     dcterms:type am:sparql-endpoint ;
     dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
     dcat:accessURL <https://qlever.dev/gbif> ;
-    dcat:accessService <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-qlever> ;
+    dcat:accessService <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-qlever> ;
     prov:wasDerivedFrom :dist-obs-gbif .
 
 # ── Dataset: taxonomy ───────────────────────────────────────────────────────

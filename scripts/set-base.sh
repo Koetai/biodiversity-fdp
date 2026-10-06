@@ -12,8 +12,6 @@ NEW="https://raw.githubusercontent.com/$ORG/$REPO/$BRANCH/fdp/"
 [ "$OLD" != "$NEW" ] || { echo "Already using $NEW"; exit 0; }
 
 find fdp -name '*.ttl' -print0 | xargs -0 perl -pi -e "s#\Q$OLD\E#$NEW#g"
-perl -pi -e "s#^github\.org=.*#github.org=$ORG#; s#^github\.repo=.*#github.repo=$REPO#; s#^github\.branch=.*#github.branch=$BRANCH#" \
-  viewer/config.properties.template
 
 echo "Rebased $OLD -> $NEW"
 python3 scripts/validate.py | tail -2

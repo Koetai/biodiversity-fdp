@@ -7,10 +7,10 @@
 @prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
 @prefix r3d:     <http://www.re3data.org/schema/3-0#> .
 @prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
-@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
-@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/plazi-fdp/> .
+@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/> .
 
-<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/plazi-fdp/>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/>
     a fdp:MetadataService, r3d:Repository ;
     dcterms:title "Plazi FAIR Data Point — Biodiversity FDP"@en ;
     dcterms:publisher :publisher-curator ;
@@ -110,8 +110,8 @@
     dcterms:type am:aggregator-mirror ;
     dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
     dcat:accessURL <https://www.gbif.org/publisher/7ce8aef0-9e92-11dc-8738-b8a03c50a862> ;
-    dcat:accessService <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-api> ;
-    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
+    dcat:accessService <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-api> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
 
 :dist-tb-gbif-aws
     a dcat:Distribution ;

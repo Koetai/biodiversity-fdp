@@ -39,7 +39,7 @@ Each distribution carries:
 - `dcat:mediaType` as an IANA IRI, and `dcterms:format` from the EU file-type authority.
 - `prov:wasDerivedFrom` when the distribution is a copy or a conversion of another one.
 
-URIs resolve as `https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/{folder}/`.
+URIs resolve as `https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/{folder}/`.
 
 ## Housekeeping
 
@@ -59,7 +59,7 @@ It fetches the index Turtle, follows `rdfs:seeAlso` to every sub-catalog, and pa
 You browse index → catalog → dataset → "ways to get it", and can filter by access method.
 Data services and `prov:wasDerivedFrom` links resolve across catalogs.
 
-- **Deploy:** `.github/workflows/pages.yml` validates the Turtle, then publishes `site/` together with `fdp/` on every push to `main`. Enable it once under *Settings → Pages → Source: GitHub Actions*. The site is then at `https://andrawaag.github.io/biodiversity-fdp/`, and the Turtle files are also served there as `text/turtle`.
+- **Deploy:** `.github/workflows/pages.yml` validates the Turtle, then publishes `site/` together with `fdp/` on every push to `main`. Enable it once under *Settings → Pages → Source: GitHub Actions*. The site is then at `https://koetai.github.io/biodiversity-fdp/`, and the Turtle files are also served there as `text/turtle`.
 - **Editing:** each catalog has *Edit on GitHub* and *History* links. GitHub handles sign-in, and people without write access get a fork and a pull request automatically. No OAuth app or secret is needed.
 - **Other FDPs:** `?index=<url of an index catalog.ttl>` browses any FDP laid out the same way, as long as it is publicly readable.
 - **Local preview:**
