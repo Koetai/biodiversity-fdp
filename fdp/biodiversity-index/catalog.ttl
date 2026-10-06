@@ -1,0 +1,67 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/biodiversity-index/> .
+
+<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/biodiversity-index/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "Biodiversity FDP — overarching index"@en ;
+    dcterms:description "Static FAIR Data Point index over biodiversity infrastructures. Each sub-catalog describes one resource and lists every way to obtain it: native portal and APIs, bulk files, cloud buckets and copies in aggregators (GBIF, QLever, Koetai). Provenance is preserved, not deduplicated: the iNaturalist subset in GBIF appears under both."@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods.ttl> , <https://koetai.semscape.org/mangal> , <https://koetai.semscape.org/fdp> ;
+    fdp:hasCatalog
+        :catalog-inaturalist ,
+        :catalog-gbif ,
+        :catalog-bhl ,
+        :catalog-plazi ,
+        :catalog-uniprot ,
+        :catalog-openstreetmap ,
+        :catalog-geonames .
+
+:catalog-inaturalist
+    a dcat:Catalog ;
+    dcterms:title "iNaturalist — citizen-science observations (native + GBIF subset)"@en ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog.ttl> .
+
+:catalog-gbif
+    a dcat:Catalog ;
+    dcterms:title "GBIF — occurrences and backbone (native, AWS Parquet, QLever)"@en ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
+
+:catalog-bhl
+    a dcat:Catalog ;
+    dcterms:title "Biodiversity Heritage Library (native + RDF on Koetai)"@en ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/bhl-fdp/catalog.ttl> .
+
+:catalog-plazi
+    a dcat:Catalog ;
+    dcterms:title "Plazi — TreatmentBank and Biodiversity Literature Repository"@en ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/plazi-fdp/catalog.ttl> .
+
+:catalog-uniprot
+    a dcat:Catalog ;
+    dcterms:title "UniProt — protein sequences and annotation (native + QLever)"@en ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl> .
+
+:catalog-openstreetmap
+    a dcat:Catalog ;
+    dcterms:title "OpenStreetMap (native + osm2rdf on QLever)"@en ;
+    dcterms:license <https://opendatacommons.org/licenses/odbl/1-0/> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/openstreetmap-fdp/catalog.ttl> .
+
+:catalog-geonames
+    a dcat:Catalog ;
+    dcterms:title "GeoNames — geographical names gazetteer"@en ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl> .
+
+:publisher-curator a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

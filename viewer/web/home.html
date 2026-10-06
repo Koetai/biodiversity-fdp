@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biodiversity FDP Viewer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <div class="logo">B</div>
+    <div><div class="brand-title">Biodiversity FDP</div><div class="brand-sub" id="repo-label">FAIR Data Point viewer</div></div>
+  </div>
+  <div class="nav">
+    <a class="active" href="/">Home</a>
+    <a href="/fdp">FDP browser</a>
+    <a href="/editor">Turtle editor</a>
+    <span class="user" id="user" hidden>Signed in as <strong id="username"></strong>
+      <button class="btn-link" id="logout">Sign out</button></span>
+  </div>
+</div>
+
+<h1>Biodiversity FAIR Data Point</h1>
+<p class="lead">Static FDP profiles for biodiversity infrastructures, kept as Turtle in GitHub.
+Each catalog lists every way to get a resource: native portals and APIs, bulk files, cloud buckets and copies in aggregators.
+Browsing needs no account; editing commits to the repository and needs a GitHub sign-in.</p>
+
+<div class="grid" style="margin-bottom:28px">
+  <a class="card clickable" href="/fdp" style="color:inherit;text-decoration:none">
+    <div class="cat-title">FDP browser</div>
+    <div class="cat-desc">Index → catalog → dataset → distribution, with how-to-access notes and endpoints.</div>
+  </a>
+  <a class="card clickable" href="/editor" style="color:inherit;text-decoration:none">
+    <div class="cat-title">Turtle editor</div>
+    <div class="cat-desc">Edit a catalog.ttl and commit it straight to the repository (sign-in required).</div>
+  </a>
+  <a class="card clickable" id="repo-tile" href="#" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">
+    <div class="cat-title">Repository ↗</div>
+    <div class="cat-desc">The Turtle sources and validation script on GitHub.</div>
+  </a>
+</div>
+
+<div class="card" id="login" style="max-width:460px">
+  <div class="cat-title">Sign in with GitHub</div>
+  <p class="muted" id="login-text" style="margin-bottom:14px">Uses the GitHub Device Flow: you confirm a short code on github.com, the token stays in this local process only.</p>
+  <button class="btn" id="btn-login">Sign in with GitHub</button>
+  <div class="device" id="device">
+    <div class="code" id="user-code">----</div>
+    <ol class="steps">
+      <li>Open <a id="verify-link" href="#" target="_blank" rel="noopener">github.com/login/device</a></li>
+      <li>Enter the code above and approve access</li>
+      <li>This page updates by itself once approved</li>
+    </ol>
+    <div class="loading" style="padding:12px 0 0" id="poll"><div class="spinner"></div><span id="poll-text">Waiting for approval…</span></div>
+  </div>
+  <div class="error" id="login-error" hidden></div>
+</div>
+
+<script>
+let pollTimer = null, pollInterval = 5000;
+const $ = id => document.getElementById(id);
+
+async function init() {
+  const cfg = await fetch('/api/config').then(r => r.json());
+  $('repo-label').textContent = cfg.org + '/' + cfg.repo + ' · ' + cfg.branch;
+  $('repo-tile').href = 'https://github.com/' + encodeURIComponent(cfg.org) + '/' + encodeURIComponent(cfg.repo);
+  if (!cfg.loginConfigured) {
+    $('btn-login').disabled = true;
+    $('login-text').textContent = 'Sign-in is not configured: set github.client_id in config.properties next to the JAR. Browsing still works.';
+  }
+  const s = await fetch('/api/auth/status').then(r => r.json());
+  if (s.loggedIn) showUser(s.username);
+}
+
+function showUser(name) {
+  $('user').hidden = false;
+  $('username').textContent = name;
+  $('login').hidden = true;
+}
+
+async function startLogin() {
+  $('btn-login').disabled = true;
+  $('login-error').hidden = true;
+  const resp = await fetch('/api/auth/device', { method: 'POST' }).then(r => r.json());
+  if (resp.error) { showError(resp.error); return; }
+  $('user-code').textContent = resp.user_code;
+  $('verify-link').href = resp.verification_uri;
+  $('device').style.display = 'block';
+  $('btn-login').style.display = 'none';
+  window.open(resp.verification_uri, '_blank', 'noopener');
+  pollInterval = (resp.interval || 5) * 1000;
+  pollTimer = setTimeout(pollAuth, pollInterval);
+}
+
+async function pollAuth() {
+  try {
+    const r = await fetch('/api/auth/poll', { method: 'POST' }).then(r => r.json());
+    if (r.status === 'complete') { location.reload(); return; }
+    if (r.status === 'pending') {
+      if (r.interval) pollInterval = r.interval * 1000;
+      pollTimer = setTimeout(pollAuth, pollInterval);
+      return;
+    }
+    showError(r.message || r.error || r.status);
+  } catch (e) {
+    pollTimer = setTimeout(pollAuth, pollInterval);
+  }
+}
+
+function showError(msg) {
+  $('login-error').textContent = 'Sign-in failed: ' + msg;
+  $('login-error').hidden = false;
+  $('device').style.display = 'none';
+  $('btn-login').style.display = '';
+  $('btn-login').disabled = false;
+}
+
+$('btn-login').addEventListener('click', startLogin);
+$('logout').addEventListener('click', async () => {
+  await fetch('/api/auth/logout', { method: 'POST' });
+  location.reload();
+});
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
+@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/uniprot-fdp/> .
+
+<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/uniprot-fdp/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "UniProt FAIR Data Point — Biodiversity FDP"@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    fdp:hasCatalog :catalog .
+
+:catalog
+    a dcat:Catalog ;
+    dcterms:title "UniProt — Universal Protein Resource"@en ;
+    dcterms:description "Protein sequences and functional annotation (UniProtKB Swiss-Prot and TrEMBL, UniRef, UniParc, Proteomes) and the UniProt taxonomy. Links to biodiversity via NCBI taxon identifiers and up:scientificName."@en ;
+    dcterms:publisher :publisher-uniprot ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage <https://www.uniprot.org> ;
+    dcat:keyword "protein"@en , "sequence"@en , "taxonomy"@en , "functional annotation"@en ;
+    dcat:dataset :uniprot-2026-03 , :uniprot-previous .
+
+:uniprot-2026-03
+    a dcat:Dataset ;
+    dcterms:title "UniProt release 2026_03"@en ;
+    dcterms:description "Current release, published 2 September 2026."@en ;
+    dcterms:identifier "UniProt-2026_03" ;
+    dcterms:version "2026_03" ;
+    dcterms:issued "2026-09-02"^^xsd:date ;
+    dcterms:publisher :publisher-uniprot ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage <https://www.uniprot.org> ;
+    dcat:distribution :dist-web , :dist-rest , :dist-sparql , :dist-ftp-flat , :dist-ftp-rdf , :dist-proteins-api , :dist-qlever .
+
+:dist-web
+    a dcat:Distribution ;
+    dcterms:title "uniprot.org — search and entry pages"@en ;
+    dcterms:description "How to get it: query builder and entry pages at https://www.uniprot.org/uniprotkb/ACCESSION; every result list has a download button (FASTA, TSV, JSON, XML, RDF)."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://www.uniprot.org> .
+
+:dist-rest
+    a dcat:Distribution ;
+    dcterms:title "UniProt REST API"@en ;
+    dcterms:description "How to get it: GET https://rest.uniprot.org/uniprotkb/search?query=organism_id:9606&format=tsv&fields=accession,gene_names ; use /stream for whole result sets and /idmapping for identifier conversion."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcterms:format ft:JSON ;
+    dcat:accessURL <https://www.uniprot.org/help/api> ;
+    dcat:accessService :svc-rest .
+
+:dist-sparql
+    a dcat:Distribution ;
+    dcterms:title "UniProt SPARQL endpoint (official)"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://sparql.uniprot.org/sparql, always the current release; core vocabulary up: = http://purl.uniprot.org/core/."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://sparql.uniprot.org/sparql> ;
+    dcat:accessService :svc-sparql .
+
+:dist-ftp-flat
+    a dcat:Distribution ;
+    dcterms:title "UniProtKB bulk files — flat text, XML, FASTA"@en ;
+    dcterms:description "How to get it: wget the files under current_release/knowledgebase/complete/ (uniprot_sprot.dat.gz, uniprot_sprot.xml.gz, uniprot_sprot.fasta.gz and the much larger TrEMBL equivalents)."@en ;
+    dcterms:type am:bulk-download ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/gzip> ;
+    dcterms:format ft:GZIP ;
+    dcat:accessURL <https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/> ;
+    dcat:downloadURL <https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz> .
+
+:dist-ftp-rdf
+    a dcat:Distribution ;
+    dcterms:title "UniProt RDF dump — RDF/XML"@en ;
+    dcterms:description "How to get it: download the compressed RDF/XML parts from current_release/rdf/ and load them into a triple store (several hundred GB uncompressed)."@en ;
+    dcterms:type am:rdf-dump ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ;
+    dcterms:format ft:RDF_XML ;
+    dcat:accessURL <https://ftp.uniprot.org/pub/databases/uniprot/current_release/rdf/> .
+
+:dist-proteins-api
+    a dcat:Distribution ;
+    dcterms:title "EBI Proteins API"@en ;
+    dcterms:description "How to get it: REST access to UniProt entries plus features, variation and proteomics mapped to the protein, e.g. GET https://www.ebi.ac.uk/proteins/api/proteins/ACCESSION."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://www.ebi.ac.uk/proteins/api/doc/> .
+
+:dist-qlever
+    a dcat:Distribution ;
+    dcterms:title "UniProt RDF on QLever"@en ;
+    dcterms:description "How to get it: SPARQL at https://qlever.dev/api/uniprot (UI qlever.dev/uniprot); same RDF as the official endpoint, loaded on the QLever instance that also hosts GBIF and Wikidata, so federated SERVICE joins stay inside one engine. Release loaded is not stated by the endpoint."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://qlever.dev/uniprot> ;
+    dcat:accessService :svc-qlever ;
+    prov:wasDerivedFrom :dist-ftp-rdf .
+
+:uniprot-previous
+    a dcat:Dataset ;
+    dcterms:title "UniProt previous releases"@en ;
+    dcterms:description "Archived releases (latest archived: 2026_02, 2026_01) for reproducing earlier analyses."@en ;
+    dcterms:identifier "UniProt-previous-releases" ;
+    dcterms:version "archive" ;
+    dcterms:publisher :publisher-uniprot ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:distribution :dist-previous-ftp .
+
+:dist-previous-ftp
+    a dcat:Distribution ;
+    dcterms:title "UniProt previous_releases FTP"@en ;
+    dcterms:description "How to get it: wget from previous_releases/release-YYYY_NN/ (knowledgebase, uniref, uniparc tarballs)."@en ;
+    dcterms:type am:bulk-download ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/gzip> ;
+    dcat:accessURL <https://ftp.uniprot.org/pub/databases/uniprot/previous_releases/> .
+
+:svc-rest
+    a dcat:DataService ;
+    dcterms:title "UniProt REST API"@en ;
+    dcat:endpointURL <https://rest.uniprot.org/> ;
+    dcat:endpointDescription <https://rest.uniprot.org/beta/docs/> ;
+    dcterms:publisher :publisher-uniprot .
+
+:svc-sparql
+    a dcat:DataService ;
+    dcterms:title "UniProt SPARQL endpoint"@en ;
+    dcat:endpointURL <https://sparql.uniprot.org/sparql> ;
+    dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ;
+    dcterms:publisher :publisher-uniprot .
+
+:svc-qlever
+    a dcat:DataService ;
+    dcterms:title "QLever SPARQL endpoint — uniprot"@en ;
+    dcat:endpointURL <https://qlever.dev/api/uniprot> ;
+    dcat:endpointDescription <https://qlever.dev/uniprot> ;
+    dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ;
+    dcterms:publisher :publisher-freiburg .
+
+:publisher-uniprot   a foaf:Organization ; foaf:name "UniProt Consortium (EMBL-EBI, SIB, PIR)"@en ; foaf:homepage <https://www.uniprot.org> .
+:publisher-freiburg  a foaf:Organization ; foaf:name "University of Freiburg — Chair of Algorithms and Data Structures (QLever)"@en ; foaf:homepage <https://ad.informatik.uni-freiburg.de> .
+:publisher-curator   a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

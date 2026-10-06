@@ -1,0 +1,200 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
+@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/inaturalist-fdp/> .
+
+<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/inaturalist-fdp/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "iNaturalist FAIR Data Point — Biodiversity FDP"@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    fdp:hasCatalog :catalog .
+
+:catalog
+    a dcat:Catalog ;
+    dcterms:title "iNaturalist — citizen-science biodiversity observations"@en ;
+    dcterms:description "Community-sourced, photo-vouchered observations of organisms and the iNaturalist taxonomy. Native access on inaturalist.org, plus the research-grade subset republished through GBIF (portal, API, AWS Parquet snapshots and the QLever RDF graph)."@en ;
+    dcterms:publisher :publisher-inat ;
+    dcat:landingPage <https://www.inaturalist.org> ;
+    dcat:themeTaxonomy <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#scheme> ;
+    dcat:keyword "citizen science"@en , "occurrence"@en , "observation"@en , "taxonomy"@en ;
+    dcat:dataset :inat-observations , :inat-taxonomy .
+
+# ── Dataset: observations (live) ────────────────────────────────────────────
+
+:inat-observations
+    a dcat:Dataset ;
+    dcterms:title "iNaturalist observations"@en ;
+    dcterms:description "All observations on iNaturalist (live database). Licence is chosen per observation and per photo by the observer (CC0, CC BY, CC BY-NC or all rights reserved); only CC0 / CC BY / CC BY-NC research-grade records flow on to GBIF."@en ;
+    dcterms:identifier "iNat-observations" ;
+    dcterms:version "live (described 2026-10-06)" ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    dcterms:publisher :publisher-inat ;
+    dcterms:rights <https://www.inaturalist.org/pages/terms> ;
+    dcat:landingPage <https://www.inaturalist.org/observations> ;
+    dcat:distribution :dist-obs-web , :dist-obs-api-v1 , :dist-obs-api-v2 , :dist-obs-export , :dist-obs-aws-open-data , :dist-obs-dwca , :dist-obs-gbif , :dist-obs-gbif-aws , :dist-obs-gbif-qlever .
+
+:dist-obs-web
+    a dcat:Distribution ;
+    dcterms:title "iNaturalist website — Explore"@en ;
+    dcterms:description "How to get it: browse or filter at inaturalist.org/observations; every observation has a stable URL https://www.inaturalist.org/observations/ID."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://www.inaturalist.org/observations> .
+
+:dist-obs-api-v1
+    a dcat:Distribution ;
+    dcterms:title "iNaturalist API v1 — JSON"@en ;
+    dcterms:description "How to get it: GET https://api.inaturalist.org/v1/observations?taxon_id=...&place_id=... (no key for reads; keep under ~60 requests/minute, 10 000 results per query; page with id_above for more)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcterms:format ft:JSON ;
+    dcat:accessURL <https://api.inaturalist.org/v1/docs/> ;
+    dcat:accessService :svc-inat-api-v1 .
+
+:dist-obs-api-v2
+    a dcat:Distribution ;
+    dcterms:title "iNaturalist API v2 — JSON with field selection"@en ;
+    dcterms:description "How to get it: GET https://api.inaturalist.org/v2/observations with a fields parameter to return only what you need; same rate limits as v1."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcterms:format ft:JSON ;
+    dcat:accessURL <https://api.inaturalist.org/v2/docs/> ;
+    dcat:accessService :svc-inat-api-v2 .
+
+:dist-obs-export
+    a dcat:Distribution ;
+    dcterms:title "iNaturalist observation export — CSV"@en ;
+    dcterms:description "How to get it: sign in (free account), build a query in the export tool, choose columns, receive a zipped CSV (max ~200 000 rows per export)."@en ;
+    dcterms:type am:bulk-download ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://www.inaturalist.org/observations/export> .
+
+:dist-obs-aws-open-data
+    a dcat:Distribution ;
+    dcterms:title "iNaturalist Licensed Observation Images — AWS Open Data (metadata 2026-09-27)"@en ;
+    dcterms:description "How to get it: aws s3 cp --no-sign-request s3://inaturalist-open-data/metadata/inaturalist-open-data-latest.tar.gz . — monthly tab-separated observations, photos, taxa and observers tables plus every CC-licensed photo under s3://inaturalist-open-data/photos/. Query the tables in place with Athena or DuckDB."@en ;
+    dcterms:type am:cloud-object-storage ;
+    dcterms:issued "2026-09-27"^^xsd:date ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/gzip> ;
+    dcterms:format ft:GZIP ;
+    dcat:accessURL <https://registry.opendata.aws/inaturalist-open-data/> ;
+    dcat:downloadURL <https://inaturalist-open-data.s3.amazonaws.com/metadata/inaturalist-open-data-latest.tar.gz> ;
+    dcat:accessService :svc-inat-s3 ;
+    rdfs:seeAlso <https://github.com/inaturalist/inaturalist-open-data> .
+
+:dist-obs-dwca
+    a dcat:Distribution ;
+    dcterms:title "iNaturalist research-grade observations — Darwin Core Archive"@en ;
+    dcterms:description "How to get it: download the weekly-regenerated zip directly; this is the exact file GBIF harvests. Contains research-grade observations licensed CC0, CC BY or CC BY-NC."@en ;
+    dcterms:type am:darwin-core-archive ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://www.inaturalist.org/observations/gbif-observations-dwca.zip> ;
+    dcat:downloadURL <https://www.inaturalist.org/observations/gbif-observations-dwca.zip> .
+
+:dist-obs-gbif
+    a dcat:Distribution ;
+    dcterms:title "Research-grade subset in GBIF — iNaturalist Research-grade Observations (doi:10.15468/ab3s5x)"@en ;
+    dcterms:description "How to get it: search on gbif.org, or GET https://api.gbif.org/v1/occurrence/search?datasetKey=50c9509d-22c7-4a22-a47d-8c48425ef4a7 for JSON; for bulk, request an occurrence download (free GBIF account) filtered on that datasetKey to get a citable DOI. 168 702 609 occurrences on 2026-10-06, GBIF-interpreted (taxonomy matched to the GBIF backbone, flags in issue)."@en ;
+    dcterms:type am:aggregator-mirror ;
+    dcterms:identifier "https://doi.org/10.15468/ab3s5x" ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://www.gbif.org/dataset/50c9509d-22c7-4a22-a47d-8c48425ef4a7> ;
+    dcat:accessService <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-api> ;
+    prov:wasDerivedFrom :dist-obs-dwca ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
+
+:dist-obs-gbif-aws
+    a dcat:Distribution ;
+    dcterms:title "Research-grade subset in the GBIF AWS Parquet snapshot (2026-10-01)"@en ;
+    dcterms:description "How to get it: read s3://gbif-open-data-eu-central-1/occurrence/2026-10-01/occurrence.parquet/ (or another region) with DuckDB, Spark or Athena and filter datasetkey = '50c9509d-22c7-4a22-a47d-8c48425ef4a7'. NB GBIF cloud snapshots only include CC0 and CC BY records, so CC BY-NC iNaturalist observations are absent here."@en ;
+    dcterms:type am:cloud-object-storage ;
+    dcterms:issued "2026-10-01"^^xsd:date ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/vnd.apache.parquet> ;
+    dcterms:format ft:PARQUET ;
+    dcat:accessURL <https://registry.opendata.aws/gbif/> ;
+    dcat:accessService <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-s3-eu-central-1> ;
+    prov:wasDerivedFrom :dist-obs-gbif .
+
+:dist-obs-gbif-qlever
+    a dcat:Distribution ;
+    dcterms:title "Research-grade subset in the GBIF RDF graph on QLever"@en ;
+    dcterms:description "How to get it: SPARQL at https://qlever.dev/api/gbif — select ?o with ?o dwc:publishingOrgKey <https://www.gbif.org/publisher/28eb1a3f-1c15-4a95-931a-4af90ecb574d> (146 178 090 occurrences on 2026-10-06; taxa via dwciri:toTaxon, coordinates as wdt:P625 WKT)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://qlever.dev/gbif> ;
+    dcat:accessService <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-qlever> ;
+    prov:wasDerivedFrom :dist-obs-gbif .
+
+# ── Dataset: taxonomy ───────────────────────────────────────────────────────
+
+:inat-taxonomy
+    a dcat:Dataset ;
+    dcterms:title "iNaturalist taxonomy"@en ;
+    dcterms:description "The taxon tree used on iNaturalist (names, ranks, common names, external links), regenerated regularly."@en ;
+    dcterms:identifier "iNat-taxonomy" ;
+    dcterms:version "live (described 2026-10-06)" ;
+    dcterms:publisher :publisher-inat ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage <https://www.inaturalist.org/taxa> ;
+    dcat:distribution :dist-tax-dwca , :dist-tax-api .
+
+:dist-tax-dwca
+    a dcat:Distribution ;
+    dcterms:title "iNaturalist taxonomy — Darwin Core Archive"@en ;
+    dcterms:description "How to get it: download the zip; core is Taxon, extension VernacularName per language."@en ;
+    dcterms:type am:darwin-core-archive ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://www.inaturalist.org/taxa/inaturalist-taxonomy.dwca.zip> ;
+    dcat:downloadURL <https://www.inaturalist.org/taxa/inaturalist-taxonomy.dwca.zip> .
+
+:dist-tax-api
+    a dcat:Distribution ;
+    dcterms:title "iNaturalist API v1 — taxa"@en ;
+    dcterms:description "How to get it: GET https://api.inaturalist.org/v1/taxa?q=NAME or /v1/taxa/ID."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://api.inaturalist.org/v1/docs/> ;
+    dcat:accessService :svc-inat-api-v1 .
+
+# ── Data services ───────────────────────────────────────────────────────────
+
+:svc-inat-api-v1
+    a dcat:DataService ;
+    dcterms:title "iNaturalist API v1"@en ;
+    dcat:endpointURL <https://api.inaturalist.org/v1/> ;
+    dcat:endpointDescription <https://api.inaturalist.org/v1/swagger.json> ;
+    dcterms:conformsTo <https://swagger.io/specification/v2/> ;
+    dcterms:publisher :publisher-inat .
+
+:svc-inat-api-v2
+    a dcat:DataService ;
+    dcterms:title "iNaturalist API v2"@en ;
+    dcat:endpointURL <https://api.inaturalist.org/v2/> ;
+    dcat:endpointDescription <https://api.inaturalist.org/v2/docs/> ;
+    dcterms:publisher :publisher-inat .
+
+:svc-inat-s3
+    a dcat:DataService ;
+    dcterms:title "AWS S3 bucket inaturalist-open-data (us-east-1, no sign-in)"@en ;
+    dcat:endpointURL <https://inaturalist-open-data.s3.amazonaws.com/> ;
+    dcat:endpointDescription <https://github.com/inaturalist/inaturalist-open-data> ;
+    dcterms:conformsTo <https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html> ;
+    dcterms:publisher :publisher-aws .
+
+:publisher-inat     a foaf:Organization ; foaf:name "iNaturalist"@en ; foaf:homepage <https://www.inaturalist.org> .
+:publisher-aws      a foaf:Organization ; foaf:name "Amazon Web Services — Open Data Sponsorship Program"@en ; foaf:homepage <https://aws.amazon.com/opendata/> .
+:publisher-curator  a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

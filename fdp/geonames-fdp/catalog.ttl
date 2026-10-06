@@ -1,0 +1,111 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
+@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/geonames-fdp/> .
+
+<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/geonames-fdp/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "GeoNames FAIR Data Point — Biodiversity FDP"@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    fdp:hasCatalog :catalog .
+
+:catalog
+    a dcat:Catalog ;
+    dcterms:title "GeoNames — geographical names gazetteer"@en ;
+    dcterms:description "Over 12 million place names with coordinates, feature classes and administrative hierarchy; the usual way to resolve locality strings and country/admin codes in occurrence data."@en ;
+    dcterms:publisher :publisher-geonames ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage <https://www.geonames.org> ;
+    dcat:keyword "gazetteer"@en , "place names"@en , "georeferencing"@en ;
+    dcat:dataset :geonames-gazetteer .
+
+:geonames-gazetteer
+    a dcat:Dataset ;
+    dcterms:title "GeoNames gazetteer"@en ;
+    dcterms:description "Daily-updated gazetteer (allCountries dump refreshed 2026-10-06)."@en ;
+    dcterms:identifier "GeoNames" ;
+    dcterms:version "2026-10-06" ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    dcterms:publisher :publisher-geonames ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage <https://www.geonames.org> ;
+    dcat:distribution :dist-web , :dist-ws , :dist-dump , :dist-rdf-dump , :dist-ontology .
+
+:dist-web
+    a dcat:Distribution ;
+    dcterms:title "geonames.org — search and feature pages"@en ;
+    dcterms:description "How to get it: search by name; each feature has a URI https://sws.geonames.org/ID/ that also dereferences to RDF."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://www.geonames.org> .
+
+:dist-ws
+    a dcat:Distribution ;
+    dcterms:title "GeoNames web services — JSON / XML"@en ;
+    dcterms:description "How to get it: register a free username, enable web services in your account, then GET http://api.geonames.org/searchJSON?q=...&username=NAME (also findNearbyJSON, countrySubdivisionJSON, hierarchyJSON; 10 000 credits/day)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcterms:format ft:JSON ;
+    dcat:accessURL <https://www.geonames.org/export/ws-overview.html> ;
+    dcat:accessService :svc-ws .
+
+:dist-dump
+    a dcat:Distribution ;
+    dcterms:title "GeoNames daily dump — tab-delimited"@en ;
+    dcterms:description "How to get it: download allCountries.zip (or one file per country, cities500/1000/5000/15000, alternateNamesV2, admin codes, hierarchy) from export/dump; daily modifications and deletes files allow incremental sync."@en ;
+    dcterms:type am:bulk-download ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://download.geonames.org/export/dump/> ;
+    dcat:downloadURL <https://download.geonames.org/export/dump/allCountries.zip> .
+
+:dist-rdf-dump
+    a dcat:Distribution ;
+    dcterms:title "GeoNames RDF dump — all-geonames-rdf.zip"@en ;
+    dcterms:description "How to get it: download the zip (about 740 MB); one RDF/XML document per line, using the GeoNames ontology. NB this file was last regenerated on 2020-02-14, so it lags the tab-delimited dump."@en ;
+    dcterms:type am:rdf-dump ;
+    dcterms:modified "2020-02-14"^^xsd:date ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://download.geonames.org/> ;
+    dcat:downloadURL <https://download.geonames.org/all-geonames-rdf.zip> .
+
+:dist-ontology
+    a dcat:Distribution ;
+    dcterms:title "GeoNames ontology (gn:)"@en ;
+    dcterms:description "How to get it: the ontology documentation and OWL file define gn:Feature, gn:featureClass, gn:parentFeature and friends used by the RDF dump and sws.geonames.org URIs."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://www.geonames.org/ontology/documentation.html> .
+
+# TODO — GeoNames on Koetai (Mangal). Fill in once the endpoint is public;
+# then add :dist-koetai-sparql to the dcat:distribution list above.
+#
+# :dist-koetai-sparql
+#     a dcat:Distribution ;
+#     dcterms:title "GeoNames as RDF on Koetai — SPARQL"@en ;
+#     dcterms:description "How to get it: SPARQL 1.1 against the Koetai endpoint; see examples and shapes pages."@en ;
+#     dcterms:type am:sparql-endpoint ;
+#     dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+#     dcat:accessURL <https://koetai.semscape.org/u/ORCID/DATASET/sparql> ;
+#     prov:wasDerivedFrom :dist-dump ;
+#     rdfs:seeAlso <https://koetai.semscape.org/mangal> .
+
+:svc-ws
+    a dcat:DataService ;
+    dcterms:title "GeoNames web services"@en ;
+    dcat:endpointURL <http://api.geonames.org/> ;
+    dcat:endpointDescription <https://www.geonames.org/export/ws-overview.html> ;
+    dcterms:publisher :publisher-geonames .
+
+:publisher-geonames  a foaf:Organization ; foaf:name "GeoNames"@en ; foaf:homepage <https://www.geonames.org> .
+:publisher-curator   a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

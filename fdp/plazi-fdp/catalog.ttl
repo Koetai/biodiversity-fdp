@@ -1,0 +1,189 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
+@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/plazi-fdp/> .
+
+<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/plazi-fdp/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "Plazi FAIR Data Point — Biodiversity FDP"@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    fdp:hasCatalog :catalog .
+
+:catalog
+    a dcat:Catalog ;
+    dcterms:title "Plazi — TreatmentBank and the Biodiversity Literature Repository"@en ;
+    dcterms:description "Taxonomic treatments, material citations, figures and bibliographic data liberated from published literature. Plazi publishes the same content through many channels: TreatmentBank, its APIs, XML and RDF in git, a SPARQL endpoint, Synospecies, GBIF and Zenodo."@en ;
+    dcterms:publisher :publisher-plazi ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcat:landingPage <https://plazi.org> ;
+    dcat:keyword "taxonomic treatment"@en , "material citation"@en , "literature"@en , "figures"@en ;
+    dcat:dataset :plazi-treatmentbank , :plazi-blr .
+
+# ── Dataset: TreatmentBank ──────────────────────────────────────────────────
+
+:plazi-treatmentbank
+    a dcat:Dataset ;
+    dcterms:title "Plazi TreatmentBank"@en ;
+    dcterms:description "Treatments extracted from taxonomic publications, each with a persistent identifier http://treatment.plazi.org/id/UUID, plus the material citations, figures and names they contain."@en ;
+    dcterms:identifier "Plazi-TreatmentBank" ;
+    dcterms:version "live (described 2026-10-06)" ;
+    dcterms:publisher :publisher-plazi ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcat:landingPage <https://plazi.org/treatmentbank/> ;
+    dcat:distribution :dist-tb-web , :dist-tb-api , :dist-tb-srs , :dist-tb-xml-git , :dist-tb-rdf-git , :dist-tb-sparql , :dist-tb-synospecies , :dist-tb-gbif , :dist-tb-gbif-aws .
+
+:dist-tb-web
+    a dcat:Distribution ;
+    dcterms:title "TreatmentBank search (GgServer)"@en ;
+    dcterms:description "How to get it: full-text and faceted search; each treatment page offers HTML, XML (TaxonX/GoldenGATE) and RDF renderings via its treatment.plazi.org URI."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://tb.plazi.org/GgServer/search> .
+
+:dist-tb-api
+    a dcat:Distribution ;
+    dcterms:title "Plazi TreatmentBank API v1"@en ;
+    dcterms:description "How to get it: REST calls such as Treatments.search, Treatments.searchForDOI and statistics per author, journal, institution or taxon (TreatmentsForTaxon, MaterialCitations); documented at api.plazi.org/v1."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcterms:format ft:JSON ;
+    dcat:accessURL <https://api.plazi.org/v1/> ;
+    dcat:accessService :svc-plazi-api .
+
+:dist-tb-srs
+    a dcat:Distribution ;
+    dcterms:title "TreatmentBank statistics / export (srsStats)"@en ;
+    dcterms:description "How to get it: compose a custom table of treatments, material citations or bibliographic fields and export as CSV, JSON or XML."@en ;
+    dcterms:type am:bulk-download ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://tb.plazi.org/GgServer/srsStats> .
+
+:dist-tb-xml-git
+    a dcat:Distribution ;
+    dcterms:title "treatments-xml — all treatments as XML in git"@en ;
+    dcterms:description "How to get it: git clone --depth 1 https://github.com/plazi/treatments-xml (large; updated continuously, so git pull gives you the changes)."@en ;
+    dcterms:type am:source-repository ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/xml> ;
+    dcterms:format ft:XML ;
+    dcat:accessURL <https://github.com/plazi/treatments-xml> .
+
+:dist-tb-rdf-git
+    a dcat:Distribution ;
+    dcterms:title "treatments-rdf — all treatments as Turtle in git"@en ;
+    dcterms:description "How to get it: git clone https://github.com/plazi/treatments-rdf and bulk-load the .ttl files into any triple store; this is the source of the Plazi SPARQL endpoint."@en ;
+    dcterms:type am:rdf-dump ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://github.com/plazi/treatments-rdf> .
+
+:dist-tb-sparql
+    a dcat:Distribution ;
+    dcterms:title "Plazi treatment SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at treatment.ld.plazi.org/sparql (returned HTTP 500 when checked on 2026-10-06 — if down, load treatments-rdf yourself)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://treatment.ld.plazi.org/sparql> ;
+    dcat:accessService :svc-plazi-sparql ;
+    prov:wasDerivedFrom :dist-tb-rdf-git .
+
+:dist-tb-synospecies
+    a dcat:Distribution ;
+    dcterms:title "Synospecies — synonymy and treatment browser"@en ;
+    dcterms:description "How to get it: type a taxon name to see all treatments, synonyms and name changes over time; built on the Plazi RDF."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://synospecies.plazi.org/> .
+
+:dist-tb-gbif
+    a dcat:Distribution ;
+    dcterms:title "Plazi in GBIF — one dataset per publication"@en ;
+    dcterms:description "How to get it: GBIF publisher 7ce8aef0-9e92-11dc-8738-b8a03c50a862 (56 309 datasets, 686 712 material-citation occurrences on 2026-10-06); query https://api.gbif.org/v1/occurrence/search?publishingOrg=7ce8aef0-9e92-11dc-8738-b8a03c50a862 or request a GBIF download with that filter."@en ;
+    dcterms:type am:aggregator-mirror ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://www.gbif.org/publisher/7ce8aef0-9e92-11dc-8738-b8a03c50a862> ;
+    dcat:accessService <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-api> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
+
+:dist-tb-gbif-aws
+    a dcat:Distribution ;
+    dcterms:title "Plazi material citations in GBIF AWS Parquet and QLever"@en ;
+    dcterms:description "How to get it: filter publishingorgkey = '7ce8aef0-9e92-11dc-8738-b8a03c50a862' in the GBIF Parquet snapshot on S3, or dwc:publishingOrgKey <https://www.gbif.org/publisher/7ce8aef0-9e92-11dc-8738-b8a03c50a862> on qlever.dev/api/gbif."@en ;
+    dcterms:type am:cloud-object-storage ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/vnd.apache.parquet> ;
+    dcterms:format ft:PARQUET ;
+    dcat:accessURL <https://registry.opendata.aws/gbif/> ;
+    prov:wasDerivedFrom :dist-tb-gbif .
+
+# ── Dataset: Biodiversity Literature Repository on Zenodo ──────────────────
+
+:plazi-blr
+    a dcat:Dataset ;
+    dcterms:title "Biodiversity Literature Repository (BLR) on Zenodo"@en ;
+    dcterms:description "Plazi deposits treatments, figures and articles in the Zenodo community biosyslit, each with its own DOI."@en ;
+    dcterms:identifier "BLR" ;
+    dcterms:version "live (described 2026-10-06)" ;
+    dcterms:publisher :publisher-plazi ;
+    dcat:landingPage <https://zenodo.org/communities/biosyslit> ;
+    dcat:distribution :dist-blr-web , :dist-blr-api , :dist-blr-oai .
+
+:dist-blr-web
+    a dcat:Distribution ;
+    dcterms:title "Zenodo community biosyslit"@en ;
+    dcterms:description "How to get it: search and browse the community on zenodo.org; every record has a DOI and downloadable files (images, PDF, XML)."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://zenodo.org/communities/biosyslit> .
+
+:dist-blr-api
+    a dcat:Distribution ;
+    dcterms:title "Zenodo REST API — biosyslit records"@en ;
+    dcterms:description "How to get it: GET https://zenodo.org/api/records?communities=biosyslit&q=...&size=100 (JSON; anonymous allowed, token raises rate limits)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://zenodo.org/api/records?communities=biosyslit> ;
+    dcat:accessService :svc-zenodo-api .
+
+:dist-blr-oai
+    a dcat:Distribution ;
+    dcterms:title "Zenodo OAI-PMH — set user-biosyslit"@en ;
+    dcterms:description "How to get it: harvest with verb=ListRecords, set=user-biosyslit and metadataPrefix oai_datacite or oai_dc; use from= for incremental updates."@en ;
+    dcterms:type am:oai-pmh ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/xml> ;
+    dcterms:format ft:XML ;
+    dcat:accessURL <https://zenodo.org/oai2d?verb=ListRecords&set=user-biosyslit&metadataPrefix=oai_datacite> .
+
+# ── Data services ───────────────────────────────────────────────────────────
+
+:svc-plazi-api
+    a dcat:DataService ;
+    dcterms:title "Plazi TreatmentBank API"@en ;
+    dcat:endpointURL <https://api.plazi.org/v1/> ;
+    dcat:endpointDescription <https://api.plazi.org/v1/> ;
+    dcterms:publisher :publisher-plazi .
+
+:svc-plazi-sparql
+    a dcat:DataService ;
+    dcterms:title "Plazi treatment SPARQL endpoint"@en ;
+    dcat:endpointURL <https://treatment.ld.plazi.org/sparql> ;
+    dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ;
+    dcterms:publisher :publisher-plazi .
+
+:svc-zenodo-api
+    a dcat:DataService ;
+    dcterms:title "Zenodo REST API"@en ;
+    dcat:endpointURL <https://zenodo.org/api/> ;
+    dcat:endpointDescription <https://developers.zenodo.org/> ;
+    dcterms:publisher :publisher-zenodo .
+
+:publisher-plazi    a foaf:Organization ; foaf:name "Plazi"@en ; foaf:homepage <https://plazi.org> .
+:publisher-zenodo   a foaf:Organization ; foaf:name "Zenodo (CERN)"@en ; foaf:homepage <https://zenodo.org> .
+:publisher-curator  a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

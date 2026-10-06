@@ -1,0 +1,210 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
+@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/> .
+
+<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/gbif-fdp/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "GBIF FAIR Data Point — Biodiversity FDP"@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    fdp:hasCatalog :catalog .
+
+:catalog
+    a dcat:Catalog ;
+    dcterms:title "GBIF — Global Biodiversity Information Facility"@en ;
+    dcterms:description "Occurrence records aggregated from tens of thousands of publishers, and the GBIF Backbone Taxonomy. Native access on gbif.org and api.gbif.org, monthly Parquet snapshots on AWS Open Data, and an RDF copy queryable with SPARQL on QLever."@en ;
+    dcterms:publisher :publisher-gbif ;
+    dcterms:rights <https://www.gbif.org/terms> ;
+    dcat:landingPage <https://www.gbif.org> ;
+    dcat:keyword "occurrence"@en , "specimen"@en , "Darwin Core"@en , "taxonomy"@en ;
+    dcat:dataset :gbif-occurrence-live , :gbif-snapshot-2026-10-01 , :gbif-snapshot-2026-09-01 , :gbif-backbone-2023-08-28 .
+
+# ── Dataset: live occurrence index ──────────────────────────────────────────
+
+:gbif-occurrence-live
+    a dcat:Dataset ;
+    dcterms:title "GBIF occurrence data — live index"@en ;
+    dcterms:description "All occurrences currently indexed by GBIF (3 956 888 741 on 2026-10-06). Each record keeps its publisher licence: CC0, CC BY or CC BY-NC."@en ;
+    dcterms:identifier "GBIF-occurrence-live" ;
+    dcterms:version "live (described 2026-10-06)" ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    dcterms:publisher :publisher-gbif ;
+    dcterms:rights <https://www.gbif.org/terms> ;
+    dcat:landingPage <https://www.gbif.org/occurrence/search> ;
+    dcat:distribution :dist-live-portal , :dist-live-api , :dist-live-download , :dist-live-sql , :dist-live-qlever .
+
+:dist-live-portal
+    a dcat:Distribution ;
+    dcterms:title "GBIF.org occurrence search"@en ;
+    dcterms:description "How to get it: search, map and filter on gbif.org; every record has a stable URL https://www.gbif.org/occurrence/GBIFID."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://www.gbif.org/occurrence/search> .
+
+:dist-live-api
+    a dcat:Distribution ;
+    dcterms:title "GBIF Occurrence API — JSON"@en ;
+    dcterms:description "How to get it: GET https://api.gbif.org/v1/occurrence/search?taxonKey=...&country=... (no key; max 300 per page and 100 000 records per query — use the download API beyond that)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcterms:format ft:JSON ;
+    dcat:accessURL <https://techdocs.gbif.org/en/openapi/v1/occurrence> ;
+    dcat:accessService :svc-gbif-api .
+
+:dist-live-download
+    a dcat:Distribution ;
+    dcterms:title "GBIF occurrence download — DwC-A, simple CSV, species list or simple Parquet, with DOI"@en ;
+    dcterms:description "How to get it: on gbif.org click Download, or POST a predicate to https://api.gbif.org/v1/occurrence/download/request with a free GBIF account. You get a zip and a DOI to cite. Formats: DWCA, SIMPLE_CSV, SPECIES_LIST, SIMPLE_PARQUET."@en ;
+    dcterms:type am:darwin-core-archive ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://techdocs.gbif.org/en/data-use/api-downloads> ;
+    dcat:accessService :svc-gbif-api .
+
+:dist-live-sql
+    a dcat:Distribution ;
+    dcterms:title "GBIF SQL download API"@en ;
+    dcterms:description "How to get it: POST an SQL query (SELECT / WHERE / GROUP BY over the occurrence table) to the download API with format SQL_TSV_ZIP; result arrives as a zipped TSV with DOI. Good for gridded counts and cubes."@en ;
+    dcterms:type am:sql-query ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://techdocs.gbif.org/en/data-use/api-sql-downloads> ;
+    dcat:accessService :svc-gbif-api .
+
+:dist-live-qlever
+    a dcat:Distribution ;
+    dcterms:title "GBIF as RDF on QLever — SPARQL"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://qlever.dev/api/gbif (UI at qlever.dev/gbif). Contains 3 657 852 005 dwc:Occurrence and 7 746 724 dwc:Taxon nodes (2026-10-06); occurrence to taxon via dwciri:toTaxon, hierarchy via skos:broader, coordinates as wdt:P625 WKT. Federates fast with Wikidata and UniProt on the same QLever instance. Load date not published, so treat as a recent copy rather than a fixed snapshot."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://qlever.dev/gbif> ;
+    dcat:accessService :svc-gbif-qlever ;
+    prov:wasDerivedFrom :gbif-occurrence-live .
+
+# ── Datasets: monthly cloud snapshots ───────────────────────────────────────
+
+:gbif-snapshot-2026-10-01
+    a dcat:Dataset ;
+    dcterms:title "GBIF monthly occurrence snapshot 2026-10-01"@en ;
+    dcterms:description "Monthly frozen export of all CC0 and CC BY occurrences (CC BY-NC records are excluded) as Parquet, mirrored in five AWS regions. Cite via the citation.txt in the snapshot folder."@en ;
+    dcterms:identifier "GBIF-snapshot-2026-10-01" ;
+    dcterms:version "2026-10-01" ;
+    dcterms:issued "2026-10-01"^^xsd:date ;
+    dcterms:publisher :publisher-gbif ;
+    dcat:landingPage <https://registry.opendata.aws/gbif/> ;
+    dcat:distribution :dist-2026-10-aws-parquet .
+
+:dist-2026-10-aws-parquet
+    a dcat:Distribution ;
+    dcterms:title "GBIF snapshot 2026-10-01 — Parquet on AWS S3"@en ;
+    dcterms:description "How to get it: aws s3 ls --no-sign-request s3://gbif-open-data-eu-central-1/occurrence/2026-10-01/occurrence.parquet/ ; or in DuckDB: SELECT ... FROM read_parquet('s3://gbif-open-data-eu-central-1/occurrence/2026-10-01/occurrence.parquet/*'). Same data in us-east-1, af-south-1, ap-southeast-2 and sa-east-1 — pick the region nearest your compute to avoid egress."@en ;
+    dcterms:type am:cloud-object-storage ;
+    dcterms:issued "2026-10-01"^^xsd:date ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/vnd.apache.parquet> ;
+    dcterms:format ft:PARQUET ;
+    dcat:accessURL <https://registry.opendata.aws/gbif/> ;
+    dcat:downloadURL <https://gbif-open-data-eu-central-1.s3.eu-central-1.amazonaws.com/occurrence/2026-10-01/citation.txt> ;
+    dcat:accessService :svc-gbif-s3-eu-central-1 , :svc-gbif-s3-us-east-1 , :svc-gbif-s3-af-south-1 , :svc-gbif-s3-ap-southeast-2 , :svc-gbif-s3-sa-east-1 ;
+    rdfs:seeAlso <https://github.com/gbif/occurrence/blob/master/aws-public-data.md> .
+
+:gbif-snapshot-2026-09-01
+    a dcat:Dataset ;
+    dcterms:title "GBIF monthly occurrence snapshot 2026-09-01"@en ;
+    dcterms:description "Previous monthly snapshot (CC0 and CC BY records only). Older snapshots stay in the buckets for reproducibility."@en ;
+    dcterms:identifier "GBIF-snapshot-2026-09-01" ;
+    dcterms:version "2026-09-01" ;
+    dcterms:issued "2026-09-01"^^xsd:date ;
+    dcterms:publisher :publisher-gbif ;
+    dcat:landingPage <https://registry.opendata.aws/gbif/> ;
+    dcat:distribution :dist-2026-09-aws-parquet .
+
+:dist-2026-09-aws-parquet
+    a dcat:Distribution ;
+    dcterms:title "GBIF snapshot 2026-09-01 — Parquet on AWS S3"@en ;
+    dcterms:description "How to get it: s3://gbif-open-data-REGION/occurrence/2026-09-01/occurrence.parquet/ with --no-sign-request, in any of the five regions."@en ;
+    dcterms:type am:cloud-object-storage ;
+    dcterms:issued "2026-09-01"^^xsd:date ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/vnd.apache.parquet> ;
+    dcterms:format ft:PARQUET ;
+    dcat:accessURL <https://registry.opendata.aws/gbif/> ;
+    dcat:accessService :svc-gbif-s3-eu-central-1 , :svc-gbif-s3-us-east-1 , :svc-gbif-s3-af-south-1 , :svc-gbif-s3-ap-southeast-2 , :svc-gbif-s3-sa-east-1 .
+
+# ── Dataset: backbone taxonomy ──────────────────────────────────────────────
+
+:gbif-backbone-2023-08-28
+    a dcat:Dataset ;
+    dcterms:title "GBIF Backbone Taxonomy 2023-08-28"@en ;
+    dcterms:description "The taxonomic backbone every GBIF occurrence is matched to (doi:10.15468/39omei)."@en ;
+    dcterms:identifier "https://doi.org/10.15468/39omei" ;
+    dcterms:version "2023-08-28" ;
+    dcterms:issued "2023-08-28"^^xsd:date ;
+    dcterms:publisher :publisher-gbif ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage <https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c> ;
+    dcat:distribution :dist-backbone-dwca , :dist-backbone-api , :dist-backbone-qlever .
+
+:dist-backbone-dwca
+    a dcat:Distribution ;
+    dcterms:title "GBIF Backbone — Darwin Core Archive"@en ;
+    dcterms:description "How to get it: download backbone.zip (Taxon core plus vernacular names, distributions, references) from the hosted-datasets folder; older versions sit next to it."@en ;
+    dcterms:type am:darwin-core-archive ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://hosted-datasets.gbif.org/datasets/backbone/2023-08-28/> ;
+    dcat:downloadURL <https://hosted-datasets.gbif.org/datasets/backbone/2023-08-28/backbone.zip> .
+
+:dist-backbone-api
+    a dcat:Distribution ;
+    dcterms:title "GBIF Species API"@en ;
+    dcterms:description "How to get it: GET https://api.gbif.org/v1/species/match?name=... for name matching, /v1/species/KEY for a taxon."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://techdocs.gbif.org/en/openapi/v1/species> ;
+    dcat:accessService :svc-gbif-api .
+
+:dist-backbone-qlever
+    a dcat:Distribution ;
+    dcterms:title "GBIF Backbone as RDF on QLever"@en ;
+    dcterms:description "How to get it: same endpoint as the occurrences (https://qlever.dev/api/gbif); taxa are dwc:Taxon with gbif:rank and gbif:taxonomicStatus IRIs, names on rdfs:label (no skos:prefLabel)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://qlever.dev/gbif> ;
+    dcat:accessService :svc-gbif-qlever ;
+    prov:wasDerivedFrom :dist-backbone-dwca .
+
+# ── Data services ───────────────────────────────────────────────────────────
+
+:svc-gbif-api
+    a dcat:DataService ;
+    dcterms:title "GBIF REST API v1"@en ;
+    dcat:endpointURL <https://api.gbif.org/v1/> ;
+    dcat:endpointDescription <https://techdocs.gbif.org/en/openapi/> ;
+    dcterms:conformsTo <https://spec.openapis.org/oas/v3.0.0> ;
+    dcterms:publisher :publisher-gbif .
+
+:svc-gbif-qlever
+    a dcat:DataService ;
+    dcterms:title "QLever SPARQL endpoint — gbif"@en ;
+    dcat:endpointURL <https://qlever.dev/api/gbif> ;
+    dcat:endpointDescription <https://qlever.dev/gbif> ;
+    dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ;
+    dcterms:publisher :publisher-freiburg .
+
+:svc-gbif-s3-eu-central-1     a dcat:DataService ; dcterms:title "S3 bucket gbif-open-data-eu-central-1 (Frankfurt)"@en ;     dcat:endpointURL <https://gbif-open-data-eu-central-1.s3.eu-central-1.amazonaws.com/> ;     dcterms:conformsTo <https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html> ; dcterms:publisher :publisher-aws .
+:svc-gbif-s3-us-east-1        a dcat:DataService ; dcterms:title "S3 bucket gbif-open-data-us-east-1 (N. Virginia)"@en ;      dcat:endpointURL <https://gbif-open-data-us-east-1.s3.us-east-1.amazonaws.com/> ;           dcterms:conformsTo <https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html> ; dcterms:publisher :publisher-aws .
+:svc-gbif-s3-af-south-1       a dcat:DataService ; dcterms:title "S3 bucket gbif-open-data-af-south-1 (Cape Town)"@en ;      dcat:endpointURL <https://gbif-open-data-af-south-1.s3.af-south-1.amazonaws.com/> ;         dcterms:conformsTo <https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html> ; dcterms:publisher :publisher-aws .
+:svc-gbif-s3-ap-southeast-2   a dcat:DataService ; dcterms:title "S3 bucket gbif-open-data-ap-southeast-2 (Sydney)"@en ;     dcat:endpointURL <https://gbif-open-data-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/> ; dcterms:conformsTo <https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html> ; dcterms:publisher :publisher-aws .
+:svc-gbif-s3-sa-east-1        a dcat:DataService ; dcterms:title "S3 bucket gbif-open-data-sa-east-1 (São Paulo)"@en ;      dcat:endpointURL <https://gbif-open-data-sa-east-1.s3.sa-east-1.amazonaws.com/> ;           dcterms:conformsTo <https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html> ; dcterms:publisher :publisher-aws .
+
+:publisher-gbif      a foaf:Organization ; foaf:name "GBIF Secretariat"@en ; foaf:homepage <https://www.gbif.org> .
+:publisher-aws       a foaf:Organization ; foaf:name "Amazon Web Services — Open Data Sponsorship Program"@en ; foaf:homepage <https://aws.amazon.com/opendata/> .
+:publisher-freiburg  a foaf:Organization ; foaf:name "University of Freiburg — Chair of Algorithms and Data Structures (QLever)"@en ; foaf:homepage <https://ad.informatik.uni-freiburg.de> .
+:publisher-curator   a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

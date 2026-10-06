@@ -1,0 +1,34 @@
+# Biodiversity FDP Viewer — configuration
+# =======================================
+# Browsing a public repository works without any of the GitHub OAuth settings.
+# To commit edits from the Turtle editor:
+#
+# 1. Create a GitHub OAuth App: https://github.com/settings/developers
+#      Application name:        Biodiversity FDP Viewer
+#      Homepage URL:            http://localhost:8765
+#      Authorization callback:  http://localhost:8765  (unused by Device Flow, but required by the form)
+#    Then tick "Enable Device Flow" in the app settings.
+# 2. Paste the Client ID below. Device Flow does not need the client secret.
+# 3. Save this file as config.properties next to fdp-viewer.jar.
+
+github.client_id=
+# github.client_secret=
+
+# Repository holding the fdp/ directory
+github.org=andrawaag
+github.repo=biodiversity-fdp
+github.branch=main
+fdp.dir=fdp
+
+# OAuth scope: public_repo is enough for a public repository; use repo for a private one.
+github.scope=public_repo
+
+# Optional: only members of this team (in github.org) may sign in. Leave empty for anyone
+# with push access; GitHub itself still enforces write permission on commit.
+github.team=
+
+# Optional: preview a local checkout instead of GitHub (read-only), e.g. before the first push.
+# local.root=..
+
+# Local port (the next free port above it is used if taken)
+# viewer.port=8765

@@ -1,0 +1,186 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
+@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/openstreetmap-fdp/> .
+
+<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/openstreetmap-fdp/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "OpenStreetMap FAIR Data Point — Biodiversity FDP"@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    fdp:hasCatalog :catalog .
+
+:catalog
+    a dcat:Catalog ;
+    dcterms:title "OpenStreetMap — collaborative map of the world"@en ;
+    dcterms:description "Nodes, ways and relations with free-form tags: protected areas, land cover, water bodies, trails and places that give spatial context to biodiversity records. Native APIs and planet files, plus the osm2rdf RDF conversion queryable on QLever."@en ;
+    dcterms:publisher :publisher-osmf ;
+    dcterms:license <https://opendatacommons.org/licenses/odbl/1-0/> ;
+    dcat:landingPage <https://www.openstreetmap.org> ;
+    dcat:keyword "geography"@en , "map"@en , "protected area"@en , "land cover"@en ;
+    dcat:dataset :osm-live , :osm-planet-2026-09-28 , :osm-rdf .
+
+# ── Dataset: live database ──────────────────────────────────────────────────
+
+:osm-live
+    a dcat:Dataset ;
+    dcterms:title "OpenStreetMap — live database"@en ;
+    dcterms:description "The continuously edited OSM database, reachable through the editing API, read-only query services and minutely change feeds."@en ;
+    dcterms:identifier "OSM-live" ;
+    dcterms:version "live (described 2026-10-06)" ;
+    dcterms:publisher :publisher-osmf ;
+    dcterms:license <https://opendatacommons.org/licenses/odbl/1-0/> ;
+    dcat:landingPage <https://www.openstreetmap.org> ;
+    dcat:distribution :dist-live-web , :dist-live-api06 , :dist-live-overpass , :dist-live-nominatim , :dist-live-diffs .
+
+:dist-live-web
+    a dcat:Distribution ;
+    dcterms:title "openstreetmap.org — map, search and object pages"@en ;
+    dcterms:description "How to get it: browse the map; every object has a page such as https://www.openstreetmap.org/way/ID with tags and history. Use Export for a small bounding box."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://www.openstreetmap.org> .
+
+:dist-live-api06
+    a dcat:Distribution ;
+    dcterms:title "OSM editing API 0.6 — OSM XML / JSON"@en ;
+    dcterms:description "How to get it: GET https://api.openstreetmap.org/api/0.6/way/ID/full or map?bbox=...; meant for editors, not bulk reads (use Overpass or planet files instead)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/xml> ;
+    dcterms:format ft:XML ;
+    dcat:accessURL <https://wiki.openstreetmap.org/wiki/API_v0.6> ;
+    dcat:accessService :svc-api06 .
+
+:dist-live-overpass
+    a dcat:Distribution ;
+    dcterms:title "Overpass API — tag and area queries"@en ;
+    dcterms:description "How to get it: POST an Overpass QL query, e.g. nwr[boundary=protected_area](area) ; out geom; to the interpreter, or try it in overpass-turbo.eu. Near-real-time, JSON or XML output."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://wiki.openstreetmap.org/wiki/Overpass_API> ;
+    dcat:accessService :svc-overpass .
+
+:dist-live-nominatim
+    a dcat:Distribution ;
+    dcterms:title "Nominatim — geocoding and reverse geocoding"@en ;
+    dcterms:description "How to get it: GET https://nominatim.openstreetmap.org/search?q=PLACE&format=jsonv2 or /reverse?lat=..&lon=..; max 1 request/second with a descriptive User-Agent."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://nominatim.openstreetmap.org/ui/search.html> .
+
+:dist-live-diffs
+    a dcat:Distribution ;
+    dcterms:title "Replication diffs — minutely, hourly, daily (osmChange)"@en ;
+    dcterms:description "How to get it: apply the osmChange files with osmium apply-changes or pyosmium-up-to-date to keep a planet or extract current."@en ;
+    dcterms:type am:change-feed ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/gzip> ;
+    dcat:accessURL <https://planet.openstreetmap.org/replication/minute/> .
+
+# ── Dataset: weekly planet ──────────────────────────────────────────────────
+
+:osm-planet-2026-09-28
+    a dcat:Dataset ;
+    dcterms:title "OpenStreetMap planet 2026-09-28"@en ;
+    dcterms:description "Weekly full-planet export (planet-260928)."@en ;
+    dcterms:identifier "OSM-planet-260928" ;
+    dcterms:version "260928" ;
+    dcterms:issued "2026-09-28"^^xsd:date ;
+    dcterms:publisher :publisher-osmf ;
+    dcterms:license <https://opendatacommons.org/licenses/odbl/1-0/> ;
+    dcat:landingPage <https://planet.openstreetmap.org/> ;
+    dcat:distribution :dist-planet-pbf , :dist-planet-xml , :dist-planet-aws-orc , :dist-planet-geofabrik .
+
+:dist-planet-pbf
+    a dcat:Distribution ;
+    dcterms:title "Planet — OSM PBF"@en ;
+    dcterms:description "How to get it: download via HTTPS from a mirror or the .torrent next to it (about 80 GB); process with osmium, osmosis or pyosmium."@en ;
+    dcterms:type am:bulk-download ;
+    dcterms:format "OSM PBF" ;
+    dcat:accessURL <https://planet.openstreetmap.org/pbf/> ;
+    dcat:downloadURL <https://planet.openstreetmap.org/pbf/planet-260928.osm.pbf> .
+
+:dist-planet-xml
+    a dcat:Distribution ;
+    dcterms:title "Planet — OSM XML (bzip2)"@en ;
+    dcterms:description "How to get it: same content as the PBF in XML, bzip2-compressed; slower to process, use only if your tooling needs XML."@en ;
+    dcterms:type am:bulk-download ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/x-bzip2> ;
+    dcterms:format ft:BZIP2 ;
+    dcat:accessURL <https://planet.openstreetmap.org/planet/> ;
+    dcat:downloadURL <https://planet.openstreetmap.org/planet/planet-latest.osm.bz2> .
+
+:dist-planet-aws-orc
+    a dcat:Distribution ;
+    dcterms:title "Planet on AWS Open Data — ORC (osm-pds)"@en ;
+    dcterms:description "How to get it: s3://osm-pds/planet/planet-latest.orc with --no-sign-request (refreshed 2026-10-02); query with Athena or Spark without downloading."@en ;
+    dcterms:type am:cloud-object-storage ;
+    dcterms:format "Apache ORC" ;
+    dcat:accessURL <https://registry.opendata.aws/osm/> ;
+    dcat:downloadURL <https://osm-pds.s3.amazonaws.com/planet/planet-latest.orc> ;
+    dcat:accessService :svc-osm-s3 .
+
+:dist-planet-geofabrik
+    a dcat:Distribution ;
+    dcterms:title "Geofabrik regional extracts"@en ;
+    dcterms:description "How to get it: download a continent, country or region as .osm.pbf or shapefile, updated daily; much smaller than the planet."@en ;
+    dcterms:type am:bulk-download ;
+    dcterms:format "OSM PBF" ;
+    dcat:accessURL <https://download.geofabrik.de/> .
+
+# ── Dataset: OSM as RDF ─────────────────────────────────────────────────────
+
+:osm-rdf
+    a dcat:Dataset ;
+    dcterms:title "OpenStreetMap as RDF (osm2rdf)"@en ;
+    dcterms:description "The planet converted to RDF by osm2rdf (University of Freiburg): every node, way and relation with its tags, WKT geometries and precomputed GeoSPARQL relations (ogc:sfContains, ogc:sfIntersects)."@en ;
+    dcterms:identifier "OSM-RDF-osm2rdf" ;
+    dcterms:version "rolling (described 2026-10-06)" ;
+    dcterms:publisher :publisher-freiburg ;
+    dcterms:license <https://opendatacommons.org/licenses/odbl/1-0/> ;
+    dcat:landingPage <https://github.com/ad-freiburg/osm2rdf> ;
+    prov:wasDerivedFrom :osm-planet-2026-09-28 ;
+    dcat:distribution :dist-rdf-qlever , :dist-rdf-dumps , :dist-rdf-tool .
+
+:dist-rdf-qlever
+    a dcat:Distribution ;
+    dcterms:title "OSM planet RDF on QLever — SPARQL"@en ;
+    dcterms:description "How to get it: SPARQL at https://qlever.dev/api/osm-planet (UI qlever.dev/osm-planet). Prefixes osmkey: for tags, geo:hasGeometry/geo:asWKT for geometry, ogc:sfContains for containment; projecting a WKT column shows a map."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://qlever.dev/osm-planet> ;
+    dcat:accessService :svc-qlever-osm .
+
+:dist-rdf-dumps
+    a dcat:Distribution ;
+    dcterms:title "osm2rdf Turtle extracts"@en ;
+    dcterms:description "How to get it: download prebuilt .ttl.bz2 files for the planet or per region from osm2rdf.cs.uni-freiburg.de and load them into any triple store."@en ;
+    dcterms:type am:rdf-dump ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://osm2rdf.cs.uni-freiburg.de/> .
+
+:dist-rdf-tool
+    a dcat:Distribution ;
+    dcterms:title "osm2rdf — convert any PBF yourself"@en ;
+    dcterms:description "How to get it: build or docker-run osm2rdf on a planet or Geofabrik extract to produce your own Turtle with the same schema."@en ;
+    dcterms:type am:source-repository ;
+    dcat:accessURL <https://github.com/ad-freiburg/osm2rdf> .
+
+# ── Data services ───────────────────────────────────────────────────────────
+
+:svc-api06      a dcat:DataService ; dcterms:title "OSM API 0.6"@en ;        dcat:endpointURL <https://api.openstreetmap.org/api/0.6/> ; dcat:endpointDescription <https://api.openstreetmap.org/api/0.6/capabilities> ; dcterms:publisher :publisher-osmf .
+:svc-overpass   a dcat:DataService ; dcterms:title "Overpass API (main instance)"@en ; dcat:endpointURL <https://overpass-api.de/api/interpreter> ; dcat:endpointDescription <https://wiki.openstreetmap.org/wiki/Overpass_API> .
+:svc-osm-s3     a dcat:DataService ; dcterms:title "AWS S3 bucket osm-pds (us-east-1)"@en ; dcat:endpointURL <https://osm-pds.s3.amazonaws.com/> ; dcterms:conformsTo <https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html> ; dcterms:publisher :publisher-aws .
+:svc-qlever-osm a dcat:DataService ; dcterms:title "QLever SPARQL endpoint — osm-planet"@en ; dcat:endpointURL <https://qlever.dev/api/osm-planet> ; dcat:endpointDescription <https://qlever.dev/osm-planet> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-freiburg .
+
+:publisher-osmf      a foaf:Organization ; foaf:name "OpenStreetMap Foundation and contributors"@en ; foaf:homepage <https://osmfoundation.org> .
+:publisher-aws       a foaf:Organization ; foaf:name "Amazon Web Services — Open Data Sponsorship Program"@en ; foaf:homepage <https://aws.amazon.com/opendata/> .
+:publisher-freiburg  a foaf:Organization ; foaf:name "University of Freiburg — Chair of Algorithms and Data Structures (QLever, osm2rdf)"@en ; foaf:homepage <https://ad.informatik.uni-freiburg.de> .
+:publisher-curator   a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

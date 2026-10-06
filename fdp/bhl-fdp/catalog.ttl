@@ -1,0 +1,195 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
+@prefix am:      <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/bhl-fdp/> .
+
+<https://raw.githubusercontent.com/andrawaag/biodiversity-fdp/main/fdp/bhl-fdp/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "Biodiversity Heritage Library FAIR Data Point — Biodiversity FDP"@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:modified "2026-10-06"^^xsd:date ;
+    fdp:hasCatalog :catalog .
+
+:catalog
+    a dcat:Catalog ;
+    dcterms:title "BHL — Biodiversity Heritage Library"@en ;
+    dcterms:description "Open-access digitised biodiversity literature: titles, items, pages, parts, creators, subjects and page-level scientific-name mentions. Native access on biodiversitylibrary.org and its API and data export, plus RDF conversions on Koetai nodes of the Mangal network."@en ;
+    dcterms:publisher :publisher-bhl ;
+    dcterms:rights <https://about.biodiversitylibrary.org/help/copyright-and-reuse/> ;
+    dcat:landingPage <https://www.biodiversitylibrary.org> ;
+    dcat:keyword "literature"@en , "taxonomic names"@en , "digitisation"@en ;
+    dcat:dataset :bhl-native , :bhl-koetai-rdf , :bhl-koetai-sample .
+
+# ── Dataset: BHL native ─────────────────────────────────────────────────────
+
+:bhl-native
+    a dcat:Dataset ;
+    dcterms:title "Biodiversity Heritage Library — native collection"@en ;
+    dcterms:description "The BHL corpus and its bibliographic and name-index metadata as served by BHL itself."@en ;
+    dcterms:identifier "BHL" ;
+    dcterms:version "live (described 2026-10-06)" ;
+    dcterms:publisher :publisher-bhl ;
+    dcterms:rights <https://about.biodiversitylibrary.org/help/copyright-and-reuse/> ;
+    dcat:landingPage <https://www.biodiversitylibrary.org> ;
+    dcat:distribution :dist-bhl-web , :dist-bhl-api3 , :dist-bhl-datazip , :dist-bhl-archive-org .
+
+:dist-bhl-web
+    a dcat:Distribution ;
+    dcterms:title "biodiversitylibrary.org — browse, read and search"@en ;
+    dcterms:description "How to get it: search titles, authors and scientific names; stable URLs for /bibliography/ID, /item/ID, /page/ID, /part/ID and /name/NAME."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://www.biodiversitylibrary.org> .
+
+:dist-bhl-api3
+    a dcat:Distribution ;
+    dcterms:title "BHL API v3 — JSON / XML"@en ;
+    dcterms:description "How to get it: request a free API key, then GET https://www.biodiversitylibrary.org/api3?op=PublicationSearch&searchterm=...&format=json&apikey=KEY (ops include GetTitleMetadata, GetPageMetadata, NameSearch, GetPartMetadata)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcterms:format ft:JSON ;
+    dcat:accessURL <https://www.biodiversitylibrary.org/api3> ;
+    dcat:accessService :svc-bhl-api3 .
+
+:dist-bhl-datazip
+    a dcat:Distribution ;
+    dcterms:title "BHL data export — data.zip (tab-delimited)"@en ;
+    dcterms:description "How to get it: download data.zip; tab-separated tables for titles, items, pages, parts, creators, subjects, identifiers and page names. This is the source of the Koetai RDF conversion."@en ;
+    dcterms:type am:bulk-download ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://about.biodiversitylibrary.org/tools-and-services/developer-and-data-tools/> ;
+    dcat:downloadURL <https://www.biodiversitylibrary.org/data/data.zip> .
+
+:dist-bhl-archive-org
+    a dcat:Distribution ;
+    dcterms:title "BHL scans and OCR on the Internet Archive"@en ;
+    dcterms:description "How to get it: every BHL item is also an Internet Archive item (collection: biodiversity); fetch page images, OCR text and djvu XML with the ia CLI (ia download IDENTIFIER) or archive.org APIs."@en ;
+    dcterms:type am:bulk-download ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/plain> ;
+    dcat:accessURL <https://archive.org/details/biodiversity> .
+
+# ── Dataset: BHL RDF on Koetai (full) ───────────────────────────────────────
+
+:bhl-koetai-rdf
+    a dcat:Dataset ;
+    dcterms:title "BHL as RDF on Koetai"@en ;
+    dcterms:description "RDF conversion of the BHL data.zip export (items, titles, creators, parts, subjects, page-level scientific-name mentions), loaded in QLever on koetai.semscape.org."@en ;
+    dcterms:identifier "https://koetai.semscape.org/fdp/dataset/0000-0001-9773-4008/bhl" ;
+    dcterms:version "1.0" ;
+    dcterms:issued "2026-09-15"^^xsd:date ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl> ;
+    prov:wasDerivedFrom :dist-bhl-datazip ;
+    rdfs:seeAlso <https://koetai.semscape.org/fdp/dataset/0000-0001-9773-4008/bhl> ;
+    dcat:distribution :dist-koetai-bhl-sparql , :dist-koetai-bhl-examples , :dist-koetai-bhl-shapes , :dist-koetai-bhl-sparqlist , :dist-koetai-bhl-void , :dist-bionames-bhl .
+
+:dist-koetai-bhl-sparql
+    a dcat:Distribution ;
+    dcterms:title "Koetai BHL — SPARQL endpoint (QLever)"@en ;
+    dcterms:description "How to get it: POST or GET a SPARQL 1.1 query to the endpoint; anonymous read access, no ORCID sign-in needed for queries."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl/sparql> ;
+    dcat:accessService :svc-koetai-bhl .
+
+:dist-koetai-bhl-examples
+    a dcat:Distribution ;
+    dcterms:title "Koetai BHL — example SPARQL queries"@en ;
+    dcterms:description "How to get it: open the examples page and run a query in the editor; start here before writing your own."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl/examples> .
+
+:dist-koetai-bhl-shapes
+    a dcat:Distribution ;
+    dcterms:title "Koetai BHL — ShEx / SHACL shapes"@en ;
+    dcterms:description "How to get it: the shapes page documents the graph schema (classes and predicates per node type)."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl/shapes> .
+
+:dist-koetai-bhl-sparqlist
+    a dcat:Distribution ;
+    dcterms:title "Koetai BHL — SPARQList REST API"@en ;
+    dcterms:description "How to get it: parameterised SPARQL queries exposed as plain REST/JSON calls, for clients that do not speak SPARQL."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl/sparqlist> .
+
+:dist-koetai-bhl-void
+    a dcat:Distribution ;
+    dcterms:title "Koetai BHL — VoID statistics"@en ;
+    dcterms:description "How to get it: curl -H 'Accept: text/turtle' on the VoID URL for class and property partition counts."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://koetai.semscape.org/fdp/void/0000-0001-9773-4008/bhl> .
+
+:dist-bionames-bhl
+    a dcat:Distribution ;
+    dcterms:title "BHL on Koetai @ bionames (Oxigraph, Mangal node)"@en ;
+    dcterms:description "How to get it: SPARQL at koetai.bionames.org, a second Koetai node in the Mangal run by Roderic Page; an independent BHL graph, so schema and coverage may differ from the semscape copy."@en ;
+    dcterms:type am:aggregator-mirror ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://koetai.bionames.org/u/0000-0002-7101-9767/bhl> ;
+    dcat:accessService :svc-bionames-bhl ;
+    rdfs:seeAlso <https://koetai.semscape.org/mangal> .
+
+# ── Dataset: BHL sample on Koetai ───────────────────────────────────────────
+
+:bhl-koetai-sample
+    a dcat:Dataset ;
+    dcterms:title "BHL (sample) as RDF on Koetai"@en ;
+    dcterms:description "Small but structurally complete sample of the BHL RDF (whole titles with all their items, pages, parts and creators), same schema as the full graph. Meant for schema discovery and whole-graph tools."@en ;
+    dcterms:identifier "https://koetai.semscape.org/fdp/dataset/0000-0001-9773-4008/bhl-sample" ;
+    dcterms:version "1.0" ;
+    dcterms:issued "2026-09-28"^^xsd:date ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl-sample> ;
+    prov:wasDerivedFrom :bhl-koetai-rdf ;
+    dcat:distribution :dist-koetai-bhl-sample-sparql .
+
+:dist-koetai-bhl-sample-sparql
+    a dcat:Distribution ;
+    dcterms:title "Koetai BHL sample — SPARQL endpoint (Fuseki)"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 against the Fuseki endpoint; small enough for CONSTRUCT of the whole graph."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl-sample/sparql> .
+
+# ── Data services ───────────────────────────────────────────────────────────
+
+:svc-bhl-api3
+    a dcat:DataService ;
+    dcterms:title "BHL API v3"@en ;
+    dcat:endpointURL <https://www.biodiversitylibrary.org/api3> ;
+    dcat:endpointDescription <https://about.biodiversitylibrary.org/tools-and-services/developer-and-data-tools/> ;
+    dcterms:publisher :publisher-bhl .
+
+:svc-koetai-bhl
+    a dcat:DataService ;
+    dcterms:title "Koetai SPARQL endpoint — bhl"@en ;
+    dcat:endpointURL <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl/sparql> ;
+    dcat:endpointDescription <https://koetai.semscape.org/fdp/void/0000-0001-9773-4008/bhl> ;
+    dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ;
+    dcterms:publisher :publisher-koetai .
+
+:svc-bionames-bhl
+    a dcat:DataService ;
+    dcterms:title "Koetai @ bionames SPARQL endpoint — bhl"@en ;
+    dcat:endpointURL <https://koetai.bionames.org/u/0000-0002-7101-9767/bhl/sparql> ;
+    dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> .
+
+:publisher-bhl      a foaf:Organization ; foaf:name "Biodiversity Heritage Library"@en ; foaf:homepage <https://www.biodiversitylibrary.org> .
+:publisher-koetai   a foaf:Organization ; foaf:name "Koetai FAIR SPARQL Platform"@en ; foaf:homepage <https://koetai.semscape.org> .
+:publisher-curator  a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .
