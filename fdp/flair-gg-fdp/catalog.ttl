@@ -1,0 +1,645 @@
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
+@prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
+@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix :        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/> .
+
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/>
+    a fdp:MetadataService, r3d:Repository ;
+    dcterms:title "FLAIR-GG FAIR Data Point — Biodiversity FDP"@en ;
+    dcterms:publisher :publisher-curator ;
+    dcterms:modified "2026-10-07"^^xsd:date ;
+    fdp:hasCatalog :catalog .
+
+:catalog
+    a dcat:Catalog ;
+    dcterms:title "FLAIR-GG — FAIR network of Spanish plant germplasm banks"@en ;
+    dcterms:description "FLAIR-GG makes seed and germplasm banks FAIR without changing their databases: each bank exports CSV templates, YARRRML turns them into RDF following a shared semantic model (germplasm, location, administrative), and each bank runs its own FAIR Data Point and SPARQL endpoints. A Virtual Platform federates queries across all members. Six banks are live; this catalog lists every way to reach them."@en ;
+    dcterms:publisher :publisher-flairgg ;
+    dcterms:rights <https://wilkinsonlab.github.io/FLAIR-GG/> ;
+    dcat:landingPage <https://wilkinsonlab.github.io/FLAIR-GG/> ;
+    dcat:keyword "germplasm"@en , "seed bank"@en , "ex situ conservation"@en , "wild flora"@en , "Spain"@en , "FAIR Data Point"@en ;
+    dcat:dataset :bgv-2023-06 , :bgusal-2025-02 , :jbclm-2025-10 , :jbo-2024-08 , :jbs-2025-02 , :urjc-2024-11 , :virtual-platform , :semantic-model , :wfo-backbone .
+
+# ── BGV-UPM ────────────────────────────────────────────────────────────
+
+:bgv-2023-06
+    a dcat:Dataset ;
+    dcterms:title "BGV-UPM germplasm collection — BGV June 2023"@en ;
+    dcterms:description "César Gómez Campo Banco de Germoplasma Vegetal de la UPM (Madrid). About 10 000 seed accessions of 3 500 wild plant species, the founding member of FLAIR-GG. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
+    dcterms:identifier "https://w3id.org/bgv-fdp" ;
+    dcterms:version "2023-06" ;
+    dcterms:issued "2023-06-28"^^xsd:date ;
+    dcterms:publisher :publisher-bgv ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    dcat:landingPage <https://w3id.org/bgv-fdp> ;
+    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcat:distribution :dist-bgv-fdp , :dist-bgv-germplasm-sparql , :dist-bgv-location-sparql , :dist-bgv-admin-sparql , :dist-bgv-fdp-sparql , :dist-bgv-iucn , :dist-bgv-species-location .
+
+:dist-bgv-fdp
+    a dcat:Distribution ;
+    dcterms:title "BGV-UPM FAIR Data Point (native metadata)"@en ;
+    dcterms:description "How to get it: open the FDP in a browser, or curl -H 'Accept: text/turtle' https://w3id.org/bgv-fdp and follow fdp:metadataCatalog, dcat:dataset and dcat:distribution to the data services. Runs the FAIR Data Point reference implementation."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://w3id.org/bgv-fdp> .
+
+:dist-bgv-germplasm-sparql
+    a dcat:Distribution ;
+    dcterms:title "BGV-UPM germplasm — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 (RDF4J) at https://w3id.org/bgv-fdp/repositories/germplasm — accessions, species with WFO identifiers, IUCN categories, collecting events (680 459 triples on 2026-10-07). The OpenAPI file documents GET and POST."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://w3id.org/bgv-fdp/repositories/germplasm> ;
+    dcat:accessService :svc-bgv-germplasm .
+
+:dist-bgv-location-sparql
+    a dcat:Distribution ;
+    dcterms:title "BGV-UPM collecting sites — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://w3id.org/bgv-fdp/repositories/location — country, coordinates and soil conditions of collecting sites (269 882 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://w3id.org/bgv-fdp/repositories/location> ;
+    dcat:accessService :svc-bgv-location .
+
+:dist-bgv-admin-sparql
+    a dcat:Distribution ;
+    dcterms:title "BGV-UPM administrative data — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://w3id.org/bgv-fdp/repositories/administrative — institute, collecting team and contact information (116 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://w3id.org/bgv-fdp/repositories/administrative> ;
+    dcat:accessService :svc-bgv-admin .
+
+:dist-bgv-fdp-sparql
+    a dcat:Distribution ;
+    dcterms:title "BGV-UPM FAIR Data Point metadata — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://w3id.org/bgv-fdp/repositories/bgv-fdp to query the DCAT metadata of the whole FDP at once (8 898 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://w3id.org/bgv-fdp/repositories/bgv-fdp> ;
+    dcat:accessService :svc-bgv-fdp-sparql .
+
+:dist-bgv-iucn
+    a dcat:Distribution ;
+    dcterms:title "BGV-UPM IUCN risk categorisation lookup — CSV / JSON"@en ;
+    dcterms:description "How to get it: GET https://bgv.linkeddata.systems/api-local/IUCN_categories (no parameters) lists every species in the bank that is Vulnerable, Endangered or Critically endangered; send Accept: application/json or text/csv. A grlc-style API over the germplasm SPARQL endpoint."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://bgv.linkeddata.systems/api-local/IUCN_categories> ;
+    dcat:accessService :svc-bgv-api ;
+    prov:wasDerivedFrom :dist-bgv-germplasm-sparql .
+
+:dist-bgv-species-location
+    a dcat:Distribution ;
+    dcterms:title "BGV-UPM collecting-site coordinates by species — JSON"@en ;
+    dcterms:description "How to get it: GET https://bgv.linkeddata.systems/api-local/species_location?speciesname=Silene%20vulgaris returns accession numbers with latitude and longitude for that species (the parameter is required)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://bgv.linkeddata.systems/api-local/species_location> ;
+    dcat:accessService :svc-bgv-api ;
+    prov:wasDerivedFrom :dist-bgv-location-sparql .
+
+:svc-bgv-germplasm a dcat:DataService ; dcterms:title "BGV-UPM germplasm SPARQL endpoint"@en ; dcat:endpointURL <https://w3id.org/bgv-fdp/repositories/germplasm> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/germplasm-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-bgv .
+:svc-bgv-location a dcat:DataService ; dcterms:title "BGV-UPM location SPARQL endpoint"@en ; dcat:endpointURL <https://w3id.org/bgv-fdp/repositories/location> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/location-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-bgv .
+:svc-bgv-admin a dcat:DataService ; dcterms:title "BGV-UPM administrative SPARQL endpoint"@en ; dcat:endpointURL <https://w3id.org/bgv-fdp/repositories/administrative> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/administrative-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-bgv .
+:svc-bgv-fdp-sparql a dcat:DataService ; dcterms:title "BGV-UPM FDP metadata SPARQL endpoint"@en ; dcat:endpointURL <https://w3id.org/bgv-fdp/repositories/bgv-fdp> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/fdp-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-bgv .
+:svc-bgv-api a dcat:DataService ; dcterms:title "BGV-UPM lookup API (api-local)"@en ; dcat:endpointURL <https://bgv.linkeddata.systems/api-local/> ; dcat:endpointDescription <https://bgv.linkeddata.systems/api-local/swagger> ; dcterms:publisher :publisher-bgv .
+
+# ── BGUSAL ────────────────────────────────────────────────────────────
+
+:bgusal-2025-02
+    a dcat:Dataset ;
+    dcterms:title "BGUSAL germplasm collection — BGUSAL February 2025"@en ;
+    dcterms:description "Banco de Germoplasma de la Universidad de Salamanca. Seeds of threatened flora of Castilla y León and spores and mycelium of fungi, hosted at CIALE since 2007. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
+    dcterms:identifier "https://bgusal.linkeddata.systems" ;
+    dcterms:version "2025-02" ;
+    dcterms:publisher :publisher-bgusal ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    dcat:landingPage <https://bgusal.linkeddata.systems> ;
+    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcat:distribution :dist-bgusal-fdp , :dist-bgusal-germplasm-sparql , :dist-bgusal-location-sparql , :dist-bgusal-iucn , :dist-bgusal-species-location .
+
+:dist-bgusal-fdp
+    a dcat:Distribution ;
+    dcterms:title "BGUSAL FAIR Data Point (native metadata)"@en ;
+    dcterms:description "How to get it: open the FDP in a browser, or curl -H 'Accept: text/turtle' https://bgusal.linkeddata.systems and follow fdp:metadataCatalog, dcat:dataset and dcat:distribution to the data services. Runs the FAIR Data Point reference implementation."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://bgusal.linkeddata.systems> .
+
+:dist-bgusal-germplasm-sparql
+    a dcat:Distribution ;
+    dcterms:title "BGUSAL germplasm — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 (RDF4J) at https://bgusal.linkeddata.systems/repositories/germplasm — accessions, species with WFO identifiers, IUCN categories, collecting events (2 198 triples on 2026-10-07). The OpenAPI file documents GET and POST."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://bgusal.linkeddata.systems/repositories/germplasm> ;
+    dcat:accessService :svc-bgusal-germplasm .
+
+:dist-bgusal-location-sparql
+    a dcat:Distribution ;
+    dcterms:title "BGUSAL collecting sites — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://bgusal.linkeddata.systems/repositories/location — country, coordinates and soil conditions of collecting sites (908 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://bgusal.linkeddata.systems/repositories/location> ;
+    dcat:accessService :svc-bgusal-location .
+
+:dist-bgusal-iucn
+    a dcat:Distribution ;
+    dcterms:title "BGUSAL IUCN risk categorisation lookup — CSV / JSON"@en ;
+    dcterms:description "How to get it: GET https://bgusal.linkeddata.systems/api-local/IUCN_categories (no parameters) lists every species in the bank that is Vulnerable, Endangered or Critically endangered; send Accept: application/json or text/csv. A grlc-style API over the germplasm SPARQL endpoint."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://bgusal.linkeddata.systems/api-local/IUCN_categories> ;
+    dcat:accessService :svc-bgusal-api ;
+    prov:wasDerivedFrom :dist-bgusal-germplasm-sparql .
+
+:dist-bgusal-species-location
+    a dcat:Distribution ;
+    dcterms:title "BGUSAL collecting-site coordinates by species — JSON"@en ;
+    dcterms:description "How to get it: GET https://bgusal.linkeddata.systems/api-local/species_location?speciesname=Silene%20vulgaris returns accession numbers with latitude and longitude for that species (the parameter is required)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://bgusal.linkeddata.systems/api-local/species_location> ;
+    dcat:accessService :svc-bgusal-api ;
+    prov:wasDerivedFrom :dist-bgusal-location-sparql .
+
+:svc-bgusal-germplasm a dcat:DataService ; dcterms:title "BGUSAL germplasm SPARQL endpoint"@en ; dcat:endpointURL <https://bgusal.linkeddata.systems/repositories/germplasm> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/bgusal-germplasm-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-bgusal .
+:svc-bgusal-location a dcat:DataService ; dcterms:title "BGUSAL location SPARQL endpoint"@en ; dcat:endpointURL <https://bgusal.linkeddata.systems/repositories/location> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/bgusal-location-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-bgusal .
+:svc-bgusal-api a dcat:DataService ; dcterms:title "BGUSAL lookup API (api-local)"@en ; dcat:endpointURL <https://bgusal.linkeddata.systems/api-local/> ; dcat:endpointDescription <https://bgusal.linkeddata.systems/api-local/swagger> ; dcterms:publisher :publisher-bgusal .
+
+# ── BG-JBCLM ────────────────────────────────────────────────────────────
+
+:jbclm-2025-10
+    a dcat:Dataset ;
+    dcterms:title "BG-JBCLM germplasm collection — JBCLM October 2025"@en ;
+    dcterms:description "Banco de Germoplasma del Jardín Botánico de Castilla-La Mancha. Seed bank of wild and threatened flora of Castilla-La Mancha, started in 2007. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
+    dcterms:identifier "https://jbclm.linkeddata.systems" ;
+    dcterms:version "2025-10" ;
+    dcterms:publisher :publisher-jbclm ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    dcat:landingPage <https://jbclm.linkeddata.systems> ;
+    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcat:distribution :dist-jbclm-fdp , :dist-jbclm-germplasm-sparql , :dist-jbclm-location-sparql , :dist-jbclm-iucn , :dist-jbclm-species-location .
+
+:dist-jbclm-fdp
+    a dcat:Distribution ;
+    dcterms:title "BG-JBCLM FAIR Data Point (native metadata)"@en ;
+    dcterms:description "How to get it: open the FDP in a browser, or curl -H 'Accept: text/turtle' https://jbclm.linkeddata.systems and follow fdp:metadataCatalog, dcat:dataset and dcat:distribution to the data services. Runs the FAIR Data Point reference implementation."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://jbclm.linkeddata.systems> .
+
+:dist-jbclm-germplasm-sparql
+    a dcat:Distribution ;
+    dcterms:title "BG-JBCLM germplasm — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 (RDF4J) at https://jbclm.linkeddata.systems/repositories/germplasm — accessions, species with WFO identifiers, IUCN categories, collecting events (57 873 triples on 2026-10-07). The OpenAPI file documents GET and POST."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbclm.linkeddata.systems/repositories/germplasm> ;
+    dcat:accessService :svc-jbclm-germplasm .
+
+:dist-jbclm-location-sparql
+    a dcat:Distribution ;
+    dcterms:title "BG-JBCLM collecting sites — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://jbclm.linkeddata.systems/repositories/location — country, coordinates and soil conditions of collecting sites (70 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbclm.linkeddata.systems/repositories/location> ;
+    dcat:accessService :svc-jbclm-location .
+
+:dist-jbclm-iucn
+    a dcat:Distribution ;
+    dcterms:title "BG-JBCLM IUCN risk categorisation lookup — CSV / JSON"@en ;
+    dcterms:description "How to get it: GET https://jbclm.linkeddata.systems/api-local/IUCN_categories (no parameters) lists every species in the bank that is Vulnerable, Endangered or Critically endangered; send Accept: application/json or text/csv. A grlc-style API over the germplasm SPARQL endpoint."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://jbclm.linkeddata.systems/api-local/IUCN_categories> ;
+    dcat:accessService :svc-jbclm-api ;
+    prov:wasDerivedFrom :dist-jbclm-germplasm-sparql .
+
+:dist-jbclm-species-location
+    a dcat:Distribution ;
+    dcterms:title "BG-JBCLM collecting-site coordinates by species — JSON"@en ;
+    dcterms:description "How to get it: GET https://jbclm.linkeddata.systems/api-local/species_location?speciesname=Silene%20vulgaris returns accession numbers with latitude and longitude for that species (the parameter is required)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbclm.linkeddata.systems/api-local/species_location> ;
+    dcat:accessService :svc-jbclm-api ;
+    prov:wasDerivedFrom :dist-jbclm-location-sparql .
+
+:svc-jbclm-germplasm a dcat:DataService ; dcterms:title "BG-JBCLM germplasm SPARQL endpoint"@en ; dcat:endpointURL <https://jbclm.linkeddata.systems/repositories/germplasm> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/jbclm-germplasm-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-jbclm .
+:svc-jbclm-location a dcat:DataService ; dcterms:title "BG-JBCLM location SPARQL endpoint"@en ; dcat:endpointURL <https://jbclm.linkeddata.systems/repositories/location> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/jbclm-location-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-jbclm .
+:svc-jbclm-api a dcat:DataService ; dcterms:title "BG-JBCLM lookup API (api-local)"@en ; dcat:endpointURL <https://jbclm.linkeddata.systems/api-local/> ; dcat:endpointDescription <https://jbclm.linkeddata.systems/api-local/swagger> ; dcterms:publisher :publisher-jbclm .
+
+# ── JBO ────────────────────────────────────────────────────────────
+
+:jbo-2024-08
+    a dcat:Dataset ;
+    dcterms:title "JBO germplasm collection — JBO August 2024"@en ;
+    dcterms:description "Banco de Germoplasma del Jardín Botánico de Olarizu (Vitoria-Gasteiz). Threatened, endemic and rare wild flora and habitats of community interest of the Basque Country and surroundings. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
+    dcterms:identifier "https://jbo.linkeddata.systems" ;
+    dcterms:version "2024-08" ;
+    dcterms:publisher :publisher-jbo ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    dcat:landingPage <https://jbo.linkeddata.systems> ;
+    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcat:distribution :dist-jbo-fdp , :dist-jbo-germplasm-sparql , :dist-jbo-location-sparql , :dist-jbo-admin-sparql , :dist-jbo-iucn , :dist-jbo-species-location .
+
+:dist-jbo-fdp
+    a dcat:Distribution ;
+    dcterms:title "JBO FAIR Data Point (native metadata)"@en ;
+    dcterms:description "How to get it: open the FDP in a browser, or curl -H 'Accept: text/turtle' https://jbo.linkeddata.systems and follow fdp:metadataCatalog, dcat:dataset and dcat:distribution to the data services. Runs the FAIR Data Point reference implementation."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://jbo.linkeddata.systems> .
+
+:dist-jbo-germplasm-sparql
+    a dcat:Distribution ;
+    dcterms:title "JBO germplasm — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 (RDF4J) at https://jbo.linkeddata.systems/repositories/germplasm — accessions, species with WFO identifiers, IUCN categories, collecting events (39 704 triples on 2026-10-07). The OpenAPI file documents GET and POST."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbo.linkeddata.systems/repositories/germplasm> ;
+    dcat:accessService :svc-jbo-germplasm .
+
+:dist-jbo-location-sparql
+    a dcat:Distribution ;
+    dcterms:title "JBO collecting sites — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://jbo.linkeddata.systems/repositories/location — country, coordinates and soil conditions of collecting sites (16 965 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbo.linkeddata.systems/repositories/location> ;
+    dcat:accessService :svc-jbo-location .
+
+:dist-jbo-admin-sparql
+    a dcat:Distribution ;
+    dcterms:title "JBO administrative data — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://jbo.linkeddata.systems/repositories/administrative — institute, collecting team and contact information (70 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbo.linkeddata.systems/repositories/administrative> ;
+    dcat:accessService :svc-jbo-admin .
+
+:dist-jbo-iucn
+    a dcat:Distribution ;
+    dcterms:title "JBO IUCN risk categorisation lookup — CSV / JSON"@en ;
+    dcterms:description "How to get it: GET https://jbo.linkeddata.systems/api-local/IUCN_categories (no parameters) lists every species in the bank that is Vulnerable, Endangered or Critically endangered; send Accept: application/json or text/csv. A grlc-style API over the germplasm SPARQL endpoint."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://jbo.linkeddata.systems/api-local/IUCN_categories> ;
+    dcat:accessService :svc-jbo-api ;
+    prov:wasDerivedFrom :dist-jbo-germplasm-sparql .
+
+:dist-jbo-species-location
+    a dcat:Distribution ;
+    dcterms:title "JBO collecting-site coordinates by species — JSON"@en ;
+    dcterms:description "How to get it: GET https://jbo.linkeddata.systems/api-local/species_location?speciesname=Silene%20vulgaris returns accession numbers with latitude and longitude for that species (the parameter is required)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbo.linkeddata.systems/api-local/species_location> ;
+    dcat:accessService :svc-jbo-api ;
+    prov:wasDerivedFrom :dist-jbo-location-sparql .
+
+:svc-jbo-germplasm a dcat:DataService ; dcterms:title "JBO germplasm SPARQL endpoint"@en ; dcat:endpointURL <https://jbo.linkeddata.systems/repositories/germplasm> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/jbo-germplasm-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-jbo .
+:svc-jbo-location a dcat:DataService ; dcterms:title "JBO location SPARQL endpoint"@en ; dcat:endpointURL <https://jbo.linkeddata.systems/repositories/location> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/jbo-location-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-jbo .
+:svc-jbo-admin a dcat:DataService ; dcterms:title "JBO administrative SPARQL endpoint"@en ; dcat:endpointURL <https://jbo.linkeddata.systems/repositories/administrative> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/jbo-administrative-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-jbo .
+:svc-jbo-api a dcat:DataService ; dcterms:title "JBO lookup API (api-local)"@en ; dcat:endpointURL <https://jbo.linkeddata.systems/api-local/> ; dcat:endpointDescription <https://jbo.linkeddata.systems/api-local/swagger> ; dcterms:publisher :publisher-jbo .
+
+# ── JBS ────────────────────────────────────────────────────────────
+
+:jbs-2025-02
+    a dcat:Dataset ;
+    dcterms:title "JBS germplasm collection — JBS February 2025"@en ;
+    dcterms:description "Banco de Germoplasma del Jardí Botànic de Sóller (Mallorca). Mediterranean and especially Balearic flora; the garden was founded in 1985. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
+    dcterms:identifier "https://jbs.linkeddata.systems" ;
+    dcterms:version "2025-02" ;
+    dcterms:publisher :publisher-jbs ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    dcat:landingPage <https://jbs.linkeddata.systems> ;
+    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcat:distribution :dist-jbs-fdp , :dist-jbs-germplasm-sparql , :dist-jbs-location-sparql , :dist-jbs-iucn , :dist-jbs-species-location .
+
+:dist-jbs-fdp
+    a dcat:Distribution ;
+    dcterms:title "JBS FAIR Data Point (native metadata)"@en ;
+    dcterms:description "How to get it: open the FDP in a browser, or curl -H 'Accept: text/turtle' https://jbs.linkeddata.systems and follow fdp:metadataCatalog, dcat:dataset and dcat:distribution to the data services. Runs the FAIR Data Point reference implementation."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://jbs.linkeddata.systems> .
+
+:dist-jbs-germplasm-sparql
+    a dcat:Distribution ;
+    dcterms:title "JBS germplasm — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 (RDF4J) at https://jbs.linkeddata.systems/repositories/germplasm — accessions, species with WFO identifiers, IUCN categories, collecting events (124 086 triples on 2026-10-07). The OpenAPI file documents GET and POST."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbs.linkeddata.systems/repositories/germplasm> ;
+    dcat:accessService :svc-jbs-germplasm .
+
+:dist-jbs-location-sparql
+    a dcat:Distribution ;
+    dcterms:title "JBS collecting sites — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://jbs.linkeddata.systems/repositories/location — country, coordinates and soil conditions of collecting sites (53 543 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbs.linkeddata.systems/repositories/location> ;
+    dcat:accessService :svc-jbs-location .
+
+:dist-jbs-iucn
+    a dcat:Distribution ;
+    dcterms:title "JBS IUCN risk categorisation lookup — CSV / JSON"@en ;
+    dcterms:description "How to get it: GET https://jbs.linkeddata.systems/api-local/IUCN_categories (no parameters) lists every species in the bank that is Vulnerable, Endangered or Critically endangered; send Accept: application/json or text/csv. A grlc-style API over the germplasm SPARQL endpoint."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://jbs.linkeddata.systems/api-local/IUCN_categories> ;
+    dcat:accessService :svc-jbs-api ;
+    prov:wasDerivedFrom :dist-jbs-germplasm-sparql .
+
+:dist-jbs-species-location
+    a dcat:Distribution ;
+    dcterms:title "JBS collecting-site coordinates by species — JSON"@en ;
+    dcterms:description "How to get it: GET https://jbs.linkeddata.systems/api-local/species_location?speciesname=Silene%20vulgaris returns accession numbers with latitude and longitude for that species (the parameter is required)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://jbs.linkeddata.systems/api-local/species_location> ;
+    dcat:accessService :svc-jbs-api ;
+    prov:wasDerivedFrom :dist-jbs-location-sparql .
+
+:svc-jbs-germplasm a dcat:DataService ; dcterms:title "JBS germplasm SPARQL endpoint"@en ; dcat:endpointURL <https://jbs.linkeddata.systems/repositories/germplasm> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/jbs-germplasm-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-jbs .
+:svc-jbs-location a dcat:DataService ; dcterms:title "JBS location SPARQL endpoint"@en ; dcat:endpointURL <https://jbs.linkeddata.systems/repositories/location> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/jbs-location-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-jbs .
+:svc-jbs-api a dcat:DataService ; dcterms:title "JBS lookup API (api-local)"@en ; dcat:endpointURL <https://jbs.linkeddata.systems/api-local/> ; dcat:endpointDescription <https://jbs.linkeddata.systems/api-local/swagger> ; dcterms:publisher :publisher-jbs .
+
+# ── BG URJC ────────────────────────────────────────────────────────────
+
+:urjc-2024-11
+    a dcat:Dataset ;
+    dcterms:title "BG URJC germplasm collection — BG URJC Nov 2024"@en ;
+    dcterms:description "Banco de Germoplasma de la Universidad Rey Juan Carlos (Madrid). 512 accessions of 222 wild species in four collections: high mountain, semi-arid, Lupinus and Canary Islands; founded 2008. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
+    dcterms:identifier "https://urjc.linkeddata.systems" ;
+    dcterms:version "2024-11" ;
+    dcterms:publisher :publisher-urjc ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    dcat:landingPage <https://urjc.linkeddata.systems> ;
+    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcat:distribution :dist-urjc-fdp , :dist-urjc-germplasm-sparql , :dist-urjc-location-sparql , :dist-urjc-admin-sparql , :dist-urjc-iucn , :dist-urjc-species-location .
+
+:dist-urjc-fdp
+    a dcat:Distribution ;
+    dcterms:title "BG URJC FAIR Data Point (native metadata)"@en ;
+    dcterms:description "How to get it: open the FDP in a browser, or curl -H 'Accept: text/turtle' https://urjc.linkeddata.systems and follow fdp:metadataCatalog, dcat:dataset and dcat:distribution to the data services. Runs the FAIR Data Point reference implementation."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://urjc.linkeddata.systems> .
+
+:dist-urjc-germplasm-sparql
+    a dcat:Distribution ;
+    dcterms:title "BG URJC germplasm — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 (RDF4J) at https://urjc.linkeddata.systems/repositories/germplasm — accessions, species with WFO identifiers, IUCN categories, collecting events (32 359 triples on 2026-10-07). The OpenAPI file documents GET and POST."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://urjc.linkeddata.systems/repositories/germplasm> ;
+    dcat:accessService :svc-urjc-germplasm .
+
+:dist-urjc-location-sparql
+    a dcat:Distribution ;
+    dcterms:title "BG URJC collecting sites — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://urjc.linkeddata.systems/repositories/location — country, coordinates and soil conditions of collecting sites (12 837 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://urjc.linkeddata.systems/repositories/location> ;
+    dcat:accessService :svc-urjc-location .
+
+:dist-urjc-admin-sparql
+    a dcat:Distribution ;
+    dcterms:title "BG URJC administrative data — SPARQL endpoint"@en ;
+    dcterms:description "How to get it: SPARQL 1.1 at https://urjc.linkeddata.systems/repositories/administrative — institute, collecting team and contact information (70 triples on 2026-10-07)."@en ;
+    dcterms:type am:sparql-endpoint ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://urjc.linkeddata.systems/repositories/administrative> ;
+    dcat:accessService :svc-urjc-admin .
+
+:dist-urjc-iucn
+    a dcat:Distribution ;
+    dcterms:title "BG URJC IUCN risk categorisation lookup — CSV / JSON"@en ;
+    dcterms:description "How to get it: GET https://urjc.linkeddata.systems/api-local/IUCN_categories (no parameters) lists every species in the bank that is Vulnerable, Endangered or Critically endangered; send Accept: application/json or text/csv. A grlc-style API over the germplasm SPARQL endpoint."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://urjc.linkeddata.systems/api-local/IUCN_categories> ;
+    dcat:accessService :svc-urjc-api ;
+    prov:wasDerivedFrom :dist-urjc-germplasm-sparql .
+
+:dist-urjc-species-location
+    a dcat:Distribution ;
+    dcterms:title "BG URJC collecting-site coordinates by species — JSON"@en ;
+    dcterms:description "How to get it: GET https://urjc.linkeddata.systems/api-local/species_location?speciesname=Silene%20vulgaris returns accession numbers with latitude and longitude for that species (the parameter is required)."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
+    dcat:accessURL <https://urjc.linkeddata.systems/api-local/species_location> ;
+    dcat:accessService :svc-urjc-api ;
+    prov:wasDerivedFrom :dist-urjc-location-sparql .
+
+:svc-urjc-germplasm a dcat:DataService ; dcterms:title "BG URJC germplasm SPARQL endpoint"@en ; dcat:endpointURL <https://urjc.linkeddata.systems/repositories/germplasm> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/urjc-germplasm-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-urjc .
+:svc-urjc-location a dcat:DataService ; dcterms:title "BG URJC location SPARQL endpoint"@en ; dcat:endpointURL <https://urjc.linkeddata.systems/repositories/location> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/urjc-location-sparql.yaml> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-urjc .
+:svc-urjc-admin a dcat:DataService ; dcterms:title "BG URJC administrative SPARQL endpoint"@en ; dcat:endpointURL <https://urjc.linkeddata.systems/repositories/administrative> ; dcterms:conformsTo <https://www.w3.org/TR/sparql11-protocol/> ; dcterms:publisher :publisher-urjc .
+:svc-urjc-api a dcat:DataService ; dcterms:title "BG URJC lookup API (api-local)"@en ; dcat:endpointURL <https://urjc.linkeddata.systems/api-local/> ; dcat:endpointDescription <https://urjc.linkeddata.systems/api-local/swagger> ; dcterms:publisher :publisher-urjc .
+
+# ── Virtual Platform ────────────────────────────────────────────────────
+
+:virtual-platform
+    a dcat:Dataset ;
+    dcterms:title "FLAIR-GG Virtual Platform — federated access to all members"@en ;
+    dcterms:description "The Virtual Platform indexes the FAIR Data Points of all member banks plus third-party services and runs federated queries and analytics over them. It also federates UniProt SPARQL (described in the UniProt catalog of this FDP)."@en ;
+    dcterms:identifier "FLAIR-GG-VP" ;
+    dcterms:version "live (described 2026-10-07)" ;
+    dcterms:publisher :publisher-flairgg ;
+    dcat:landingPage <https://wilkinsonlab.github.io/FLAIR-GG/VP/index.html> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl> ;
+    dcat:distribution :dist-vp-portal , :dist-vp-index , :dist-vp-proxy , :dist-vp-driada , :dist-vp-ena , :dist-vp-swagger .
+
+:dist-vp-portal
+    a dcat:Distribution ;
+    dcterms:title "FLAIR-GG Virtual Platform portal"@en ;
+    dcterms:description "How to get it: open the portal in a browser to search catalogs, datasets and services of all member banks and run federated queries; no account needed."@en ;
+    dcterms:type am:aggregator-mirror ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://vp.bgv.cbgp.upm.es> .
+
+:dist-vp-index
+    a dcat:Distribution ;
+    dcterms:title "Virtual Platform resource index — JSON"@en ;
+    dcterms:description "How to get it: GET https://vp.linkeddata.systems returns a JSON array of every indexed FDP, catalog, dataset and data service (resource, title, type); 60 entries over six banks on 2026-10-07. Handy to discover new members."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcterms:format ft:JSON ;
+    dcat:accessURL <https://vp.linkeddata.systems> .
+
+:dist-vp-proxy
+    a dcat:Distribution ;
+    dcterms:title "FDP Index Proxy — register a DCAT document"@en ;
+    dcterms:description "How to get it: POST {'clientUrl': 'https://my.server.org/my_dcat_record.ttl'} as application/json to the proxy; it adds the metadata the platform requires and indexes your record, so a plain DCAT file is enough to join."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
+    dcat:accessURL <https://wilkinsonlab.github.io/FLAIR-GG/Proxy/index.html> ;
+    dcat:accessService :svc-vp-proxy .
+
+:dist-vp-driada
+    a dcat:Distribution ;
+    dcterms:title "Dríada — legal protection status of Spanish flora"@en ;
+    dcterms:description "How to get it: GET https://vp.linkeddata.systems/wrapped-services/driada/lookup?species=Abies%20pinsapo returns CSV rows with the protection level (national or regional), region, family, category and official bulletin reference from the Spanish Catalogue of Threatened Species, the special-protection list and regional catalogues."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcterms:license <https://opensource.org/license/mit> ;
+    dcat:accessURL <https://vp.linkeddata.systems/wrapped-services/driada/lookup> ;
+    dcat:accessService :svc-vp-driada .
+
+:dist-vp-ena
+    a dcat:Distribution ;
+    dcterms:title "ENA sequence retrieval via TogoWS"@en ;
+    dcterms:description "How to get it: GET http://togows.org/entry/ebi-ena/ACCESSION to fetch a sequence by its ENA accession; the Virtual Platform uses it to link germplasm species to sequence surveys."@en ;
+    dcterms:type am:rest-api ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/plain> ;
+    dcat:accessURL <http://togows.org/> ;
+    dcat:accessService :svc-vp-ena .
+
+:dist-vp-swagger
+    a dcat:Distribution ;
+    dcterms:title "Swagger UI for the FLAIR-GG service interfaces"@en ;
+    dcterms:description "How to get it: try every OpenAPI interface (SPARQL endpoints, lookups, wrapped services) interactively in the browser."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://bgv.cbgp.upm.es/swagger> .
+
+:svc-vp-proxy  a dcat:DataService ; dcterms:title "FLAIR-GG FDP Index Proxy"@en ; dcat:endpointURL <https://bgv.cbgp.upm.es/fdp-index-proxy/proxy> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/Proxy/index.html> ; dcterms:publisher :publisher-flairgg .
+:svc-vp-driada a dcat:DataService ; dcterms:title "Dríada wrapped service"@en ; dcat:endpointURL <https://vp.linkeddata.systems/wrapped-services/driada/lookup> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/wrapped_services.yaml> ; dcterms:publisher :publisher-flairgg .
+:svc-vp-ena    a dcat:DataService ; dcterms:title "TogoWS (DBCLS)"@en ; dcat:endpointURL <http://togows.org/> ; dcat:endpointDescription <https://wilkinsonlab.github.io/FLAIR-GG/VP/interfaces/sequence_lookup.yaml> ; dcterms:publisher :publisher-dbcls .
+
+# ── Semantic model and tooling ──────────────────────────────────────────
+
+:semantic-model
+    a dcat:Dataset ;
+    dcterms:title "FLAIR-GG semantic model, templates and FLAIR-in-a-Box"@en ;
+    dcterms:description "Everything a new bank needs to join: the FAO/IPGRI multi-crop passport descriptor ontology, CSV input templates with paired YARRRML mappings for the germplasm, location and administrative models, and FLAIR-in-a-Box, which installs a triplestore, FAIR Data Point and APIs in one go."@en ;
+    dcterms:identifier "FLAIR-GG-semantic-model" ;
+    dcterms:version "main (described 2026-10-07)" ;
+    dcterms:publisher :publisher-flairgg ;
+    dcterms:license <https://opensource.org/license/mit> ;
+    dcat:landingPage <https://wilkinsonlab.github.io/FLAIR-GG/SemanticModel/index.html> ;
+    dcat:distribution :dist-mcpd-owl , :dist-mcpd-ttl , :dist-csv-templates , :dist-yarrrml , :dist-flair-in-a-box , :dist-onboarding .
+
+:dist-mcpd-owl
+    a dcat:Distribution ;
+    dcterms:title "Multi-crop passport descriptor ontology — OWL (RDF/XML)"@en ;
+    dcterms:description "How to get it: download the OWL file; terms live in the namespace https://w3id.org/fao-ipgr/multi-passport-descriptor.owl# used by every germplasm graph. NB the link on the FLAIR-GG home page (multi-passport-descriptor.owl) returned 404 on 2026-10-07; this is the current file."@en ;
+    dcterms:type am:rdf-dump ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ;
+    dcterms:format ft:RDF_XML ;
+    dcat:accessURL <https://github.com/wilkinsonlab/multi-crop-passport-descriptor-ontology> ;
+    dcat:downloadURL <https://wilkinsonlab.github.io/multi-crop-passport-descriptor-ontology/multi-crop-passport-descriptors.owl> .
+
+:dist-mcpd-ttl
+    a dcat:Distribution ;
+    dcterms:title "Multi-crop passport descriptor ontology — Turtle"@en ;
+    dcterms:description "How to get it: download the Turtle serialisation of the same ontology."@en ;
+    dcterms:type am:rdf-dump ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:format ft:RDF_TURTLE ;
+    dcat:accessURL <https://github.com/wilkinsonlab/multi-crop-passport-descriptor-ontology> ;
+    dcat:downloadURL <https://wilkinsonlab.github.io/multi-crop-passport-descriptor-ontology/multi-passport-descriptor.ttl> .
+
+:dist-csv-templates
+    a dcat:Distribution ;
+    dcterms:title "CSV input templates (germplasm, location, administrative)"@en ;
+    dcterms:description "How to get it: export your bank's records into these CSV layouts; they are the only thing a bank has to produce."@en ;
+    dcterms:type am:source-repository ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/csv> ;
+    dcterms:format ft:CSV ;
+    dcat:accessURL <https://github.com/wilkinsonlab/FLAIR-GG/tree/main/SemanticModel/CSV> .
+
+:dist-yarrrml
+    a dcat:Distribution ;
+    dcterms:title "YARRRML mapping templates"@en ;
+    dcterms:description "How to get it: run the YARRRML files with the yarrrml-rmlmapper-docker image to turn the CSV templates into RDF following the semantic model."@en ;
+    dcterms:type am:source-repository ;
+    dcat:accessURL <https://github.com/wilkinsonlab/FLAIR-GG/tree/main/SemanticModel/YARRRML> .
+
+:dist-flair-in-a-box
+    a dcat:Distribution ;
+    dcterms:title "FLAIR-in-a-Box — one-command deployment"@en ;
+    dcterms:description "How to get it: clone the folder and follow its README; docker compose brings up the triplestore, FAIR Data Point, transformation pipeline and lookup APIs for a new member."@en ;
+    dcterms:type am:source-repository ;
+    dcat:accessURL <https://github.com/wilkinsonlab/FLAIR-GG/tree/main/FLAIR-in-a-box> .
+
+:dist-onboarding
+    a dcat:Distribution ;
+    dcterms:title "Onboarding documentation"@en ;
+    dcterms:description "How to get it: step-by-step guide for a germplasm bank joining the network; the FLAIR-GG team can also host a temporary endpoint."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> ;
+    dcat:accessURL <https://github.com/wilkinsonlab/FLAIR-GG/tree/main/Onboarding> .
+
+# ── World Flora Online backbone ─────────────────────────────────────────
+
+:wfo-backbone
+    a dcat:Dataset ;
+    dcterms:title "World Flora Online taxonomic backbone (as used by FLAIR-GG)"@en ;
+    dcterms:description "The WFO plant taxonomy that FLAIR-GG uses to reconcile species names across banks; every germplasm record points to a WFO identifier."@en ;
+    dcterms:identifier "https://w3id.org/bgv-fdp/dataset/7f92e351-bd11-4941-8bcb-4a9046038cb0" ;
+    dcterms:version "current" ;
+    dcterms:publisher :publisher-wfo ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcat:landingPage <https://www.worldfloraonline.org> ;
+    dcat:distribution :dist-wfo-download , :dist-wfo-fdp .
+
+:dist-wfo-download
+    a dcat:Distribution ;
+    dcterms:title "WFO taxonomic backbone — Darwin Core Archive (latest static version)"@en ;
+    dcterms:description "How to get it: the latest DwC-A zip (about 105 MB, CC0) is always at doi:10.5281/zenodo.18007552 together with all earlier versions; the WFO download page lists each version with its own DOI. Match names against it in R with the WorldFlora package."@en ;
+    dcterms:type am:darwin-core-archive ;
+    dcterms:identifier "https://doi.org/10.5281/zenodo.18007552" ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
+    dcterms:format ft:ZIP ;
+    dcat:accessURL <https://doi.org/10.5281/zenodo.18007552> ;
+    rdfs:seeAlso <https://www.worldfloraonline.org/downloadData> .
+
+:dist-wfo-fdp
+    a dcat:Distribution ;
+    dcterms:title "WFO backbone record in the BGV-UPM FAIR Data Point"@en ;
+    dcterms:description "How to get it: curl -H 'Accept: text/turtle' on the dataset IRI for the DCAT description FLAIR-GG maintains for WFO."@en ;
+    dcterms:type am:web-portal ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcat:accessURL <https://w3id.org/bgv-fdp/dataset/7f92e351-bd11-4941-8bcb-4a9046038cb0> .
+
+# ── Publishers ──────────────────────────────────────────────────────────
+
+:publisher-flairgg  a foaf:Organization ; foaf:name "FLAIR-GG — CBGP (UPM-INIA/CSIC) and Universidad Politécnica de Madrid"@en ; foaf:homepage <https://wilkinsonlab.github.io/FLAIR-GG/> .
+:publisher-bgv      a foaf:Organization ; foaf:name "Banco de Germoplasma Vegetal, Universidad Politécnica de Madrid (BGV-UPM)"@es ; foaf:homepage <http://www.bancodegermoplasma.upm.es/> .
+:publisher-bgusal   a foaf:Organization ; foaf:name "Banco de Germoplasma de la Universidad de Salamanca (BGUSAL)"@es ; foaf:homepage <https://bgusal.linkeddata.systems> .
+:publisher-jbclm    a foaf:Organization ; foaf:name "Jardín Botánico de Castilla-La Mancha (BG-JBCLM)"@es ; foaf:homepage <https://jbclm.linkeddata.systems> .
+:publisher-jbo      a foaf:Organization ; foaf:name "Jardín Botánico de Olarizu (JBO)"@es ; foaf:homepage <https://jbo.linkeddata.systems> .
+:publisher-jbs      a foaf:Organization ; foaf:name "Jardí Botànic de Sóller (JBS)"@ca ; foaf:homepage <https://jbs.linkeddata.systems> .
+:publisher-urjc     a foaf:Organization ; foaf:name "Universidad Rey Juan Carlos (BG URJC)"@es ; foaf:homepage <https://urjc.linkeddata.systems> .
+:publisher-wfo      a foaf:Organization ; foaf:name "World Flora Online Consortium"@en ; foaf:homepage <https://www.worldfloraonline.org> .
+:publisher-dbcls    a foaf:Organization ; foaf:name "Database Center for Life Science (DBCLS)"@en ; foaf:homepage <https://dbcls.rois.ac.jp> .
+:publisher-curator  a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

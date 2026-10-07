@@ -13,7 +13,7 @@
     dcterms:description "Static FAIR Data Point index over biodiversity infrastructures. Each sub-catalog describes one resource and lists every way to obtain it: native portal and APIs, bulk files, cloud buckets and copies in aggregators (GBIF, QLever, Koetai). Provenance is preserved, not deduplicated: the iNaturalist subset in GBIF appears under both."@en ;
     dcterms:publisher :publisher-curator ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
-    dcterms:modified "2026-10-06"^^xsd:date ;
+    dcterms:modified "2026-10-07"^^xsd:date ;
     rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods.ttl> , <https://koetai.semscape.org/mangal> , <https://koetai.semscape.org/fdp> ;
     fdp:hasCatalog
         :catalog-inaturalist ,
@@ -22,7 +22,8 @@
         :catalog-plazi ,
         :catalog-uniprot ,
         :catalog-openstreetmap ,
-        :catalog-geonames .
+        :catalog-geonames ,
+        :catalog-flair-gg .
 
 :catalog-inaturalist
     a dcat:Catalog ;
@@ -63,5 +64,11 @@
     dcterms:title "GeoNames — geographical names gazetteer"@en ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl> .
+
+:catalog-flair-gg
+    a dcat:Catalog ;
+    dcterms:title "FLAIR-GG — FAIR network of Spanish plant germplasm banks"@en ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/catalog.ttl> .
 
 :publisher-curator a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .

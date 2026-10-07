@@ -19,6 +19,7 @@ fdp/
 ├── uniprot-fdp/catalog.ttl          UniProt 2026_03 (web, REST, SPARQL, FTP, RDF, Proteins API, QLever)
 ├── openstreetmap-fdp/catalog.ttl    OSM live, planet 2026-09-28, osm2rdf on QLever
 ├── geonames-fdp/catalog.ttl         GeoNames (web services, dumps, RDF dump, ontology)
+├── flair-gg-fdp/catalog.ttl         FLAIR-GG: 6 Spanish germplasm banks (FDPs, SPARQL, lookup APIs), Virtual Platform, semantic model
 └── vocab/access-methods.ttl         SKOS scheme used as dcterms:type on each distribution
 ```
 
