@@ -184,8 +184,8 @@ function locate(target) {
 // A leaf whose veins end in nodes; veins are cut out in the page background colour.
 const LOGO = `<svg viewBox="0 0 24 24" aria-hidden="true">
   <path d="M3.5 20.5C3.5 10 9 3.5 21 3.5C21 15 14.5 20.5 3.5 20.5Z" fill="currentColor"/>
-  <path d="M5.5 18.5L16.5 7.5M10 14V9.6M13 11H17.4M7.6 16.4H11.6" stroke="var(--bg)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-  <g fill="var(--bg)"><circle cx="10" cy="8.6" r="1.25"/><circle cx="18.4" cy="11" r="1.25"/><circle cx="12.6" cy="16.4" r="1.25"/><circle cx="17.2" cy="6.8" r="1.25"/></g></svg>`;
+  <path d="M5.5 18.5L16.5 7.5M10 14V9.6M13 11H17.4M7.6 16.4H11.6" stroke="var(--logo-cut, var(--bg))" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <g fill="var(--logo-cut, var(--bg))"><circle cx="10" cy="8.6" r="1.25"/><circle cx="18.4" cy="11" r="1.25"/><circle cx="12.6" cy="16.4" r="1.25"/><circle cx="17.2" cy="6.8" r="1.25"/></g></svg>`;
 
 const ICON_PATHS = {
   'web-portal': '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.5 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3z"/>',
@@ -248,7 +248,7 @@ function renderChrome() {
     (repo ? link(`https://github.com/${repo.org}/${repo.name}#readme`, 'About') : '');
   $('topright').innerHTML = (repo ? `<a class="btn ghost" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}" target="_blank" rel="noopener">GitHub</a>` : '') +
     `<a class="btn" href="${esc(indexModel.file)}" target="_blank" rel="noopener">Turtle</a>`;
-  $('footer').innerHTML = `<div><div class="lockup">${LOGO}<span>${esc(name)}</span></div>
+  $('footer').innerHTML = `<div><div class="lockup" style="--logo-cut: var(--tint)">${LOGO}<span>${esc(name)}</span></div>
       A static FAIR Data Point, rendered in your browser with <a href="https://github.com/rdfjs/N3.js" target="_blank" rel="noopener">N3.js</a>.</div>
     <div>${indexModel.publisher ? 'Curated by ' + esc(indexModel.publisher) + '<br>' : ''}
       Browse another FDP with <span class="mono">?index=&lt;url&gt;</span></div>`;
@@ -280,52 +280,51 @@ function fileButtons(file) {
 
 // ── Index ───────────────────────────────────────────────────────────────────
 
+function searchForm(q, m, methods, cls) {
+  return `<form class="search ${cls || ''}" id="search" role="search">
+    <input id="q" type="search" value="${esc(q || '')}" placeholder="Search sources, APIs, dumps, endpoints…" aria-label="Search">
+    <select id="m" aria-label="Access method"><option value="">All methods</option>
+      ${methods.map(x => `<option value="${esc(localName(x.type))}"${localName(x.type) === m ? ' selected' : ''}>${esc(x.label)}</option>`).join('')}</select>
+    <button class="btn" type="submit">Search</button>
+  </form>`;
+}
+function wireSearch() {
+  $('search').onsubmit = e => { e.preventDefault(); location.hash = searchHref($('q').value.trim(), $('m').value); };
+}
+
 function showIndex() {
   const all = allDistributions();
   const methods = methodsInUse();
-  const feed = methods.slice(0, 6).map(m => {
-    const first = m.items[0];
-    const sources = [...new Set(m.items.map(x => shortTitle(x.c.title)))];
-    return `<a href="${searchHref('', m.type)}">${icon(m.type)}<div>
-      <div class="label">${esc(m.label)} · ${m.items.length}</div>
-      <div class="feed-title">${esc(first.d.title)}</div>
-      <div class="feed-meta">${esc(sources.slice(0, 4).join(', '))}${sources.length > 4 ? ` and ${sources.length - 4} more` : ''}</div>
-    </div></a>`;
-  }).join('');
 
-  let html = `<section class="hero">
-    <div>
-      <h1>Every way to get biodiversity data</h1>
-      <p>${catalogs.length} infrastructures, ${all.length} ways to reach them: portals, APIs, SPARQL endpoints, bulk dumps, cloud buckets and copies in aggregators, described as a FAIR Data Point.</p>
-      <form class="search" id="search" role="search">
-        <input id="q" type="search" placeholder="Search sources, APIs, dumps, endpoints…" aria-label="Search">
-        <div class="search-row">
-          <select id="m" aria-label="Access method"><option value="">all access methods</option>
-            ${methods.map(m => `<option value="${esc(localName(m.type))}">${esc(m.label.toLowerCase())}</option>`).join('')}</select>
-          <button class="btn" type="submit">Search</button>
-        </div>
-      </form>
-    </div>
-    <div class="feed">${feed}</div>
-  </section>`;
+  let html = `<div class="hero-band"><div class="wrap"><div class="hero">
+      <div class="mark" style="--logo-cut: var(--tint)">${LOGO}</div>
+      <h1>Every way to get <em>biodiversity</em> data</h1>
+      <p>${catalogs.length} infrastructures and ${all.length} ways to reach them, from portals and APIs to SPARQL endpoints, bulk dumps and cloud buckets, described as one FAIR Data Point.</p>
+      ${searchForm('', '', methods)}
+    </div></div></div><div class="wrap">`;
 
   if (failures.length) html += `<div class="notice error">Could not load: ${failures.map(esc).join('<br>')}</div>`;
 
+  html += `<section><div class="section-head"><h2>Ways to get data</h2><span class="count">by access method</span></div><div class="tiles">` +
+    methods.map(m => `<a class="tile" href="${searchHref('', m.type)}"><span class="disc">${icon(m.type)}</span>
+      <span><span class="tile-label">${esc(m.label)}</span><br><span class="tile-n">${m.items.length} across ${new Set(m.items.map(x => x.c.key)).size} catalogs</span></span></a>`).join('') +
+    '</div></section>';
+
   html += `<section id="catalogs"><div class="section-head"><h2>Catalogs</h2>
-    <span class="count">${catalogs.length} catalogs · updated ${esc(indexModel.modified || '')}</span></div><div class="rows">`;
+    <span class="count">${catalogs.length} catalogs${indexModel.modified ? ' · updated ' + esc(indexModel.modified) : ''}</span></div><div class="blocks">`;
   for (const c of catalogs) {
     const n = c.datasets.length, d = c.datasets.reduce((s, x) => s + x.distributions.length, 0);
     const types = [...new Set(c.datasets.flatMap(x => x.distributions.map(y => y.typeLabel)).filter(Boolean))];
-    html += `<a class="row" href="${hrefFor(c.key)}">
-      <div class="row-side"><span class="label">Catalog</span><span class="fmt">${n} dataset${n !== 1 ? 's' : ''} · ${d} ways</span></div>
-      <div><div class="row-title">${esc(c.title || c.key)}</div>
-        <div class="row-desc">${c.missing ? 'Catalog file could not be loaded.' : esc(c.description || '')}</div>
-        <div class="row-meta">${types.map(esc).join(' · ')}</div></div>
+    html += `<a class="block" href="${hrefFor(c.key)}">
+      <h3>${esc(c.title || c.key)}</h3>
+      <p>${c.missing ? 'Catalog file could not be loaded.' : esc(c.description || '')}</p>
+      <div class="stats">${n} dataset${n !== 1 ? 's' : ''} · ${d} ways to get it</div>
+      <div class="chips">${types.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
     </a>`;
   }
-  html += '</div></section>' + turtleSection(indexModel.file);
+  html += '</div></section>' + turtleSection(indexModel.file) + '</div>';
   $('view').innerHTML = html;
-  $('search').onsubmit = e => { e.preventDefault(); location.hash = searchHref($('q').value.trim(), $('m').value); };
+  wireSearch();
   wireTurtle(indexModel.file);
 }
 
@@ -349,24 +348,19 @@ function showSearch(params) {
   let html = crumbs([{ label: 'Search' }]) + `<div class="page-head">
     <div class="eyebrow">Search</div>
     <h1>${q ? `“${esc(q)}”` : label ? esc(label) : 'All ways to get data'}</h1>
-    <form class="search" id="search" role="search" style="margin-top:18px">
-      <input id="q" type="search" value="${esc(q)}" placeholder="Search sources, APIs, dumps, endpoints…" aria-label="Search">
-      <div class="search-row"><select id="m" aria-label="Access method"><option value="">all access methods</option>
-        ${methods.map(x => `<option value="${esc(localName(x.type))}"${localName(x.type) === m ? ' selected' : ''}>${esc(x.label.toLowerCase())}</option>`).join('')}</select>
-        <button class="btn" type="submit">Search</button></div>
-    </form>
+    ${searchForm(q, m, methods, 'left')}
   </div>
   <section><div class="section-head"><h2>Results</h2><span class="count">${hits.length} of ${allDistributions().length}</span></div>
   <div class="rows">${hits.map(h => distRow(h.d, h)).join('') || '<p class="row-desc" style="padding:18px 0">Nothing matches. Try fewer words.</p>'}</div></section>`;
-  $('view').innerHTML = html;
-  $('search').onsubmit = e => { e.preventDefault(); location.hash = searchHref($('q').value.trim(), $('m').value); };
+  $('view').innerHTML = '<div class="wrap">' + html + '</div>';
+  wireSearch();
 }
 
 // ── Catalog ─────────────────────────────────────────────────────────────────
 
 function showCatalog(key) {
   const c = catalogs.find(x => x.key === key);
-  if (!c) { $('view').innerHTML = crumbs([]) + '<div class="notice">Unknown catalog.</div>'; return; }
+  if (!c) { $('view').innerHTML = '<div class="wrap">' + crumbs([]) + '<div class="notice">Unknown catalog.</div></div>'; return; }
   const meta = [link(c.landingPage, 'Website ↗'), link(c.license, 'Licence ↗'), c.publisher ? 'Publisher: ' + esc(c.publisher) : ''].filter(Boolean);
   let html = crumbs([{ label: shortTitle(c.title) || key }]) + `<div class="page-head">
     <div class="eyebrow">Catalog</div><h1>${esc(c.title || key)}</h1><p>${esc(c.description || '')}</p>
@@ -382,7 +376,7 @@ function showCatalog(key) {
     </a>`;
   }
   html += '</div></section>' + turtleSection(c.file);
-  $('view').innerHTML = html;
+  $('view').innerHTML = '<div class="wrap">' + html + '</div>';
   wireTurtle(c.file);
 }
 
@@ -391,7 +385,7 @@ function showCatalog(key) {
 function showDataset(key, id) {
   const c = catalogs.find(x => x.key === key);
   const ds = c && c.datasets.find(d => d.id === id);
-  if (!ds) { $('view').innerHTML = crumbs([]) + '<div class="notice">Unknown dataset.</div>'; return; }
+  if (!ds) { $('view').innerHTML = '<div class="wrap">' + crumbs([]) + '<div class="notice">Unknown dataset.</div></div>'; return; }
 
   const meta = [];
   if (ds.issued) meta.push('Issued ' + esc(ds.issued));
@@ -410,7 +404,7 @@ function showDataset(key, id) {
     <div class="tabs" id="filters" role="tablist"><button class="on" data-m="">All<span class="n">${dists.length}</span></button>` +
     methods.map(([t, l]) => `<button data-m="${esc(t)}">${esc(l)}<span class="n">${dists.filter(d => d.type === t).length}</span></button>`).join('') +
     `</div><div class="rows" id="dists" style="border-top:none"></div>`;
-  $('view').innerHTML = html;
+  $('view').innerHTML = '<div class="wrap">' + html + '</div>';
 
   let filter = null;
   const render = () => { $('dists').innerHTML = dists.filter(d => !filter || d.type === filter).map(d => distRow(d)).join(''); };
@@ -469,5 +463,5 @@ function wireTurtle(file) {
 }
 
 init().catch(e => {
-  $('view').innerHTML = `<div class="notice error">Could not load the FAIR Data Point: ${esc(e.message)}</div>`;
+  $('view').innerHTML = `<div class="wrap"><div class="notice error">Could not load the FAIR Data Point: ${esc(e.message)}</div></div>`;
 });
