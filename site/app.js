@@ -179,124 +179,243 @@ function locate(target) {
   return null;
 }
 
+// ── Icons (monochrome, stroke = currentColor) ───────────────────────────────
+
+// A leaf whose veins end in nodes; veins are cut out in the page background colour.
+const LOGO = `<svg viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M3.5 20.5C3.5 10 9 3.5 21 3.5C21 15 14.5 20.5 3.5 20.5Z" fill="currentColor"/>
+  <path d="M5.5 18.5L16.5 7.5M10 14V9.6M13 11H17.4M7.6 16.4H11.6" stroke="var(--bg)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <g fill="var(--bg)"><circle cx="10" cy="8.6" r="1.25"/><circle cx="18.4" cy="11" r="1.25"/><circle cx="12.6" cy="16.4" r="1.25"/><circle cx="17.2" cy="6.8" r="1.25"/></g></svg>`;
+
+const ICON_PATHS = {
+  'web-portal': '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.5 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3z"/>',
+  'rest-api': '<path d="M8 4c-2 0-3 1-3 3v2c0 1.5-.7 2.5-2 3 1.3.5 2 1.5 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1.5.7 2.5 2 3-1.3.5-2 1.5-2 3v2c0 2-1 3-3 3"/>',
+  'sparql-endpoint': '<circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7.5 6h9M6.3 8.2l4.4 7.6M17.7 8.2l-4.4 7.6"/>',
+  'bulk-download': '<path d="M12 3v12M7 10l5 5 5-5M4 17v3h16v-3"/>',
+  'cloud-object-storage': '<path d="M7 18a5 5 0 0 1-.6-9.96A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9H7z"/>',
+  'darwin-core-archive': '<path d="M3 4h18v4H3zM5 8v12h14V8M10 12h4"/>',
+  'rdf-dump': '<path d="M14 3H6v18h12V7l-4-4zM14 3v4h4"/><circle cx="9.5" cy="14" r="1.3"/><circle cx="14.5" cy="11.5" r="1.3"/><circle cx="14.5" cy="16.5" r="1.3"/>',
+  'source-repository': '<circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 7.2v9.6M18 10.2c0 4-6 3-11 7"/>',
+  'aggregator-mirror': '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  'oai-pmh': '<path d="M20 11a8 8 0 0 0-14.6-4.5M4 4v3h3M4 13a8 8 0 0 0 14.6 4.5M20 20v-3h-3"/>',
+  'sql-query': '<ellipse cx="12" cy="5.5" rx="7.5" ry="2.5"/><path d="M4.5 5.5v13c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-13M4.5 12c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5"/>',
+  'change-feed': '<path d="M3 12h4l3-7 4 14 3-7h4"/>',
+};
+const icon = type => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[localName(type)] || '<circle cx="12" cy="12" r="8"/>'}</svg>`;
+
+// ── Flattened view for search and method counts ────────────────────────────
+
+function allDistributions() {
+  return catalogs.flatMap(c => c.datasets.flatMap(ds => ds.distributions.map(d => ({ c, ds, d }))));
+}
+function methodsInUse() {
+  const by = new Map();
+  for (const x of allDistributions()) {
+    if (!x.d.type) continue;
+    if (!by.has(x.d.type)) by.set(x.d.type, { type: x.d.type, label: x.d.typeLabel, items: [] });
+    by.get(x.d.type).items.push(x);
+  }
+  return [...by.values()].sort((a, b) => b.items.length - a.items.length);
+}
+
 // ── Routing ─────────────────────────────────────────────────────────────────
+// #/                         index
+// #/search?q=…&m=<method>    search over all distributions
+// #/<catalog>                catalog
+// #/<catalog>/<dataset>      dataset
 
 window.addEventListener('hashchange', route);
 function route() {
-  const [, key, ds] = location.hash.split('/').map(decodeURIComponent);
-  methodFilter = null;
-  if (key && ds) showDataset(key, ds);
+  const [path, query] = location.hash.replace(/^#\/?/, '').split('?');
+  const [key, ds] = path.split('/').filter(Boolean).map(decodeURIComponent);
+  if (key === 'search') showSearch(new URLSearchParams(query || ''));
+  else if (key && ds) showDataset(key, ds);
   else if (key) showCatalog(key);
   else showIndex();
   window.scrollTo(0, 0);
 }
 const hrefFor = (...parts) => '#/' + parts.map(encodeURIComponent).join('/');
+const searchHref = (q, m) => '#/search?' + new URLSearchParams(Object.entries({ q: q || '', m: m ? localName(m) : '' }).filter(([, v]) => v));
 
-function crumbs(parts) {
-  $('crumbs').innerHTML = '<a href="#">Index</a>' + parts.map(p =>
-    '<span>›</span>' + (p.href ? `<a href="${p.href}">${esc(p.label)}</a>` : `<span class="current">${esc(p.label)}</span>`)).join('');
-}
-
-// ── Rendering ───────────────────────────────────────────────────────────────
+// ── Chrome ──────────────────────────────────────────────────────────────────
 
 function renderChrome() {
-  document.title = indexModel.title || 'FAIR Data Point';
-  $('brand-title').textContent = (indexModel.title || 'FAIR Data Point').split(' — ')[0];
-  $('repo-label').textContent = repo ? `${repo.org}/${repo.name} · ${repo.branch}` : new URL(indexModel.file).host;
-  $('nav').innerHTML = '<a href="#">Index</a>' +
-    (repo ? link(`https://github.com/${repo.org}/${repo.name}`, 'Repository ↗') : '') +
-    link(indexModel.file, 'Index Turtle ↗');
-  $('footer').innerHTML = `Rendered in your browser from <span class="mono">${esc(indexModel.file)}</span>
-    with <a href="https://github.com/rdfjs/N3.js" target="_blank" rel="noopener">N3.js</a>.
-    Browse another FDP with <span class="mono">?index=&lt;url of its index catalog.ttl&gt;</span>.`;
+  const name = (indexModel.title || 'FAIR Data Point').split(' — ')[0];
+  document.title = name;
+  const [word, ...rest] = name.split(' ');
+  $('lockup').innerHTML = `${LOGO}<span>${esc(word)}${rest.length ? ` <span class="sub">${esc(rest.join(' '))}</span>` : ''}</span>`;
+  $('topnav').innerHTML = `<a href="#catalogs">Catalogs</a><a href="${searchHref()}">Search</a>` +
+    (repo ? link(`https://github.com/${repo.org}/${repo.name}#readme`, 'About') : '');
+  $('topright').innerHTML = (repo ? `<a class="btn ghost" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}" target="_blank" rel="noopener">GitHub</a>` : '') +
+    `<a class="btn" href="${esc(indexModel.file)}" target="_blank" rel="noopener">Turtle</a>`;
+  $('footer').innerHTML = `<div><div class="lockup">${LOGO}<span>${esc(name)}</span></div>
+      A static FAIR Data Point, rendered in your browser with <a href="https://github.com/rdfjs/N3.js" target="_blank" rel="noopener">N3.js</a>.</div>
+    <div>${indexModel.publisher ? 'Curated by ' + esc(indexModel.publisher) + '<br>' : ''}
+      Browse another FDP with <span class="mono">?index=&lt;url&gt;</span></div>`;
+  // "Catalogs" in the top bar scrolls on the index, navigates elsewhere.
+  $('topnav').querySelector('a[href="#catalogs"]').onclick = e => {
+    e.preventDefault();
+    if (location.hash.replace(/^#\/?/, '')) { location.hash = ''; setTimeout(() => scrollToId('catalogs'), 0); }
+    else scrollToId('catalogs');
+  };
+}
+const scrollToId = id => { const el = $(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); };
+
+function crumbs(parts) {
+  return `<nav class="crumbs" aria-label="Breadcrumb"><a href="#">Index</a>` +
+    parts.map(p => `<span>/</span>${p.href ? `<a href="${p.href}">${esc(p.label)}</a>` : `<span>${esc(p.label)}</span>`}`).join('') + '</nav>';
 }
 
-function fileActions(file) {
+function fileButtons(file) {
   if (!file) return '';
-  const parts = [link(file, 'Turtle file ↗')];
+  const out = [`<a class="btn ghost" href="${esc(file)}" target="_blank" rel="noopener">Turtle file</a>`];
   if (repo && file.startsWith(`https://raw.githubusercontent.com/${repo.org}/${repo.name}/${repo.branch}/`)) {
     const path = file.split(`/${repo.branch}/`).slice(1).join(`/${repo.branch}/`);
     const gh = `https://github.com/${repo.org}/${repo.name}`;
-    parts.push(link(`${gh}/edit/${repo.branch}/${path}`, 'Edit on GitHub ↗'));
-    parts.push(link(`${gh}/commits/${repo.branch}/${path}`, 'History ↗'));
+    out.push(`<a class="btn ghost" href="${esc(`${gh}/edit/${repo.branch}/${path}`)}" target="_blank" rel="noopener">Edit on GitHub</a>`);
+    out.push(`<a class="btn ghost" href="${esc(`${gh}/commits/${repo.branch}/${path}`)}" target="_blank" rel="noopener">History</a>`);
   }
-  return `<div class="actions">${parts.join('')}</div>`;
+  return `<div class="actions">${out.join('')}</div>`;
 }
 
+// ── Index ───────────────────────────────────────────────────────────────────
+
 function showIndex() {
-  crumbs([]);
-  const totalDist = catalogs.reduce((s, c) => s + c.datasets.reduce((t, d) => t + d.distributions.length, 0), 0);
-  let html = `<h1>${esc(indexModel.title || 'FAIR Data Point')}</h1>`;
-  if (indexModel.description) html += `<p class="lead">${esc(indexModel.description)}</p>`;
-  html += fileActions(indexModel.file);
-  html += `<p class="muted" style="margin-bottom:14px">${catalogs.length} catalogs · ${totalDist} ways to get data` +
-          (indexModel.modified ? ` · updated ${esc(indexModel.modified)}` : '') + '</p>';
-  if (failures.length) html += `<div class="card error" style="margin-bottom:14px">Could not load: ${failures.map(esc).join('<br>')}</div>`;
-  html += '<div class="grid">';
+  const all = allDistributions();
+  const methods = methodsInUse();
+  const feed = methods.slice(0, 6).map(m => {
+    const first = m.items[0];
+    const sources = [...new Set(m.items.map(x => shortTitle(x.c.title)))];
+    return `<a href="${searchHref('', m.type)}">${icon(m.type)}<div>
+      <div class="label">${esc(m.label)} · ${m.items.length}</div>
+      <div class="feed-title">${esc(first.d.title)}</div>
+      <div class="feed-meta">${esc(sources.slice(0, 4).join(', '))}${sources.length > 4 ? ` and ${sources.length - 4} more` : ''}</div>
+    </div></a>`;
+  }).join('');
+
+  let html = `<section class="hero">
+    <div>
+      <h1>Every way to get biodiversity data</h1>
+      <p>${catalogs.length} infrastructures, ${all.length} ways to reach them: portals, APIs, SPARQL endpoints, bulk dumps, cloud buckets and copies in aggregators, described as a FAIR Data Point.</p>
+      <form class="search" id="search" role="search">
+        <input id="q" type="search" placeholder="Search sources, APIs, dumps, endpoints…" aria-label="Search">
+        <div class="search-row">
+          <select id="m" aria-label="Access method"><option value="">all access methods</option>
+            ${methods.map(m => `<option value="${esc(localName(m.type))}">${esc(m.label.toLowerCase())}</option>`).join('')}</select>
+          <button class="btn" type="submit">Search</button>
+        </div>
+      </form>
+    </div>
+    <div class="feed">${feed}</div>
+  </section>`;
+
+  if (failures.length) html += `<div class="notice error">Could not load: ${failures.map(esc).join('<br>')}</div>`;
+
+  html += `<section id="catalogs"><div class="section-head"><h2>Catalogs</h2>
+    <span class="count">${catalogs.length} catalogs · updated ${esc(indexModel.modified || '')}</span></div><div class="rows">`;
   for (const c of catalogs) {
     const n = c.datasets.length, d = c.datasets.reduce((s, x) => s + x.distributions.length, 0);
-    const methods = [...new Set(c.datasets.flatMap(x => x.distributions.map(y => y.typeLabel)).filter(Boolean))];
-    html += `<a class="card clickable" href="${hrefFor(c.key)}" style="color:inherit;text-decoration:none">
-      <div class="cat-title">${esc(c.title || c.key)}</div>
-      <div class="cat-desc">${c.missing ? '<span class="error">Catalog file could not be loaded.</span>' : esc(c.description || '')}</div>
-      <div class="cat-meta">${n} dataset${n !== 1 ? 's' : ''} · ${d} distribution${d !== 1 ? 's' : ''}</div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">${methods.map(m => `<span class="chip">${esc(m)}</span>`).join('')}</div>
+    const types = [...new Set(c.datasets.flatMap(x => x.distributions.map(y => y.typeLabel)).filter(Boolean))];
+    html += `<a class="row" href="${hrefFor(c.key)}">
+      <div class="row-side"><span class="label">Catalog</span><span class="fmt">${n} dataset${n !== 1 ? 's' : ''} · ${d} ways</span></div>
+      <div><div class="row-title">${esc(c.title || c.key)}</div>
+        <div class="row-desc">${c.missing ? 'Catalog file could not be loaded.' : esc(c.description || '')}</div>
+        <div class="row-meta">${types.map(esc).join(' · ')}</div></div>
     </a>`;
   }
-  html += '</div>' + turtleTabs();
+  html += '</div></section>' + turtleSection(indexModel.file);
   $('view').innerHTML = html;
-  wireTabs(indexModel.file);
+  $('search').onsubmit = e => { e.preventDefault(); location.hash = searchHref($('q').value.trim(), $('m').value); };
+  wireTurtle(indexModel.file);
 }
+
+const shortTitle = t => (t || '').split(' — ')[0];
+
+// ── Search ──────────────────────────────────────────────────────────────────
+
+function showSearch(params) {
+  const q = (params.get('q') || '').trim();
+  const m = params.get('m') || '';
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const hits = allDistributions().filter(({ c, ds, d }) => {
+    if (m && localName(d.type) !== m) return false;
+    const hay = [c.title, ds.title, ds.version, d.title, d.description, d.typeLabel, d.mediaType, d.format,
+                 d.accessURL, ...d.services.map(s => (s.title || '') + ' ' + (s.endpointURL || ''))].join(' ').toLowerCase();
+    return terms.every(t => hay.includes(t));
+  });
+  const methods = methodsInUse();
+  const label = m ? (methods.find(x => localName(x.type) === m) || {}).label || m : '';
+
+  let html = crumbs([{ label: 'Search' }]) + `<div class="page-head">
+    <div class="eyebrow">Search</div>
+    <h1>${q ? `“${esc(q)}”` : label ? esc(label) : 'All ways to get data'}</h1>
+    <form class="search" id="search" role="search" style="margin-top:18px">
+      <input id="q" type="search" value="${esc(q)}" placeholder="Search sources, APIs, dumps, endpoints…" aria-label="Search">
+      <div class="search-row"><select id="m" aria-label="Access method"><option value="">all access methods</option>
+        ${methods.map(x => `<option value="${esc(localName(x.type))}"${localName(x.type) === m ? ' selected' : ''}>${esc(x.label.toLowerCase())}</option>`).join('')}</select>
+        <button class="btn" type="submit">Search</button></div>
+    </form>
+  </div>
+  <section><div class="section-head"><h2>Results</h2><span class="count">${hits.length} of ${allDistributions().length}</span></div>
+  <div class="rows">${hits.map(h => distRow(h.d, h)).join('') || '<p class="row-desc" style="padding:18px 0">Nothing matches. Try fewer words.</p>'}</div></section>`;
+  $('view').innerHTML = html;
+  $('search').onsubmit = e => { e.preventDefault(); location.hash = searchHref($('q').value.trim(), $('m').value); };
+}
+
+// ── Catalog ─────────────────────────────────────────────────────────────────
 
 function showCatalog(key) {
   const c = catalogs.find(x => x.key === key);
-  if (!c) { $('view').innerHTML = '<div class="card">Unknown catalog.</div>'; crumbs([]); return; }
-  crumbs([{ label: c.title || key }]);
-  const meta = [link(c.landingPage, 'Landing page ↗'), link(c.license, 'Licence ↗'), c.publisher ? 'Publisher: ' + esc(c.publisher) : ''].filter(Boolean);
-  let html = `<h1>${esc(c.title || key)}</h1><p class="lead">${esc(c.description || '')}` +
-             (meta.length ? `<br><span class="muted">${meta.join(' · ')}</span>` : '') + '</p>';
-  html += fileActions(c.file);
-  html += '<div class="section-title">Datasets</div>';
+  if (!c) { $('view').innerHTML = crumbs([]) + '<div class="notice">Unknown catalog.</div>'; return; }
+  const meta = [link(c.landingPage, 'Website ↗'), link(c.license, 'Licence ↗'), c.publisher ? 'Publisher: ' + esc(c.publisher) : ''].filter(Boolean);
+  let html = crumbs([{ label: shortTitle(c.title) || key }]) + `<div class="page-head">
+    <div class="eyebrow">Catalog</div><h1>${esc(c.title || key)}</h1><p>${esc(c.description || '')}</p>
+    ${meta.length ? `<div class="meta">${meta.join('')}</div>` : ''}${fileButtons(c.file)}</div>`;
+  html += `<section><div class="section-head"><h2>Datasets</h2><span class="count">${c.datasets.length}</span></div><div class="rows">`;
   for (const ds of c.datasets) {
     const n = ds.distributions.length;
-    html += `<a class="card clickable ds-row" href="${hrefFor(c.key, ds.id)}" style="color:inherit;text-decoration:none">
-      <div class="ds-version">${esc(ds.version || ds.id)}</div>
-      <div class="ds-info"><div class="ds-title">${esc(ds.title || ds.id)}</div><div class="muted">${esc(ds.description || '')}</div></div>
-      <span class="chip">${n} way${n !== 1 ? 's' : ''} to get it</span>
+    const dates = [ds.issued && 'Issued ' + ds.issued, ds.modified && 'Modified ' + ds.modified].filter(Boolean);
+    html += `<a class="row" href="${hrefFor(c.key, ds.id)}">
+      <div class="row-side"><span class="label">Dataset</span><span class="version">${esc(ds.version || ds.id)}</span></div>
+      <div><div class="row-title">${esc(ds.title || ds.id)}</div><div class="row-desc">${esc(ds.description || '')}</div>
+        <div class="row-meta"><span>${n} way${n !== 1 ? 's' : ''} to get it</span>${dates.map(d => `<span>${esc(d)}</span>`).join('')}</div></div>
     </a>`;
   }
-  html += turtleTabs();
+  html += '</div></section>' + turtleSection(c.file);
   $('view').innerHTML = html;
-  wireTabs(c.file);
+  wireTurtle(c.file);
 }
+
+// ── Dataset ─────────────────────────────────────────────────────────────────
 
 function showDataset(key, id) {
   const c = catalogs.find(x => x.key === key);
   const ds = c && c.datasets.find(d => d.id === id);
-  if (!ds) { $('view').innerHTML = '<div class="card">Unknown dataset.</div>'; crumbs([]); return; }
-  crumbs([{ label: c.title || key, href: hrefFor(key) }, { label: ds.version || ds.id }]);
+  if (!ds) { $('view').innerHTML = crumbs([]) + '<div class="notice">Unknown dataset.</div>'; return; }
 
   const meta = [];
   if (ds.issued) meta.push('Issued ' + esc(ds.issued));
   if (ds.modified) meta.push('Modified ' + esc(ds.modified));
   if (ds.identifier) meta.push(safeUrl(ds.identifier) ? link(ds.identifier, ds.identifier) : esc(ds.identifier));
   if (ds.license) meta.push(link(ds.license, 'Licence ↗'));
-  if (ds.landingPage) meta.push(link(ds.landingPage, 'Landing page ↗'));
+  if (ds.landingPage) meta.push(link(ds.landingPage, 'Website ↗'));
   meta.push(...derivedLinks(ds.derivedFrom));
 
   const dists = ds.distributions;
   const methods = [...new Map(dists.filter(d => d.type).map(d => [d.type, d.typeLabel])).entries()];
-  let html = `<h1>${esc(ds.title || ds.id)}</h1><p class="lead">${esc(ds.description || '')}` +
-             (meta.length ? `<br><span class="muted">${meta.join(' · ')}</span>` : '') + '</p>';
-  html += `<div class="section-title">Ways to get it (${dists.length})</div>`;
-  html += '<div class="filters" id="filters"><button class="on" data-m="">All</button>' +
-          methods.map(([t, l]) => `<button data-m="${esc(t)}">${esc(l)}</button>`).join('') + '</div>';
-  html += '<div class="grid" id="dists"></div>';
+  let html = crumbs([{ label: shortTitle(c.title) || key, href: hrefFor(key) }, { label: ds.version || ds.id }]) +
+    `<div class="page-head"><div class="eyebrow">Dataset · ${esc(ds.version || ds.id)}</div>
+     <h1>${esc(ds.title || ds.id)}</h1><p>${esc(ds.description || '')}</p>
+     ${meta.length ? `<div class="meta">${meta.map(x => `<span>${x}</span>`).join('')}</div>` : ''}</div>
+    <div class="tabs" id="filters" role="tablist"><button class="on" data-m="">All<span class="n">${dists.length}</span></button>` +
+    methods.map(([t, l]) => `<button data-m="${esc(t)}">${esc(l)}<span class="n">${dists.filter(d => d.type === t).length}</span></button>`).join('') +
+    `</div><div class="rows" id="dists" style="border-top:none"></div>`;
   $('view').innerHTML = html;
 
-  const render = () => { $('dists').innerHTML = dists.filter(d => !methodFilter || d.type === methodFilter).map(distCard).join(''); };
+  let filter = null;
+  const render = () => { $('dists').innerHTML = dists.filter(d => !filter || d.type === filter).map(d => distRow(d)).join(''); };
   $('filters').querySelectorAll('button').forEach(b => b.onclick = () => {
-    methodFilter = b.dataset.m || null;
+    filter = b.dataset.m || null;
     $('filters').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
     render();
   });
@@ -311,38 +430,44 @@ function derivedLinks(list) {
   });
 }
 
-function distCard(d) {
+// One distribution as a list row. `ctx` (search results) adds where it lives.
+function distRow(d, ctx) {
   const how = (d.description || '').replace(/^How to get it:\s*/i, '');
   const fmt = [...new Set([d.mediaType, d.format].filter(Boolean))].join(' · ');
-  const links = [link(d.accessURL, 'Open ↗'), link(d.downloadURL, 'Download ↓'), d.license ? link(d.license, 'Licence ↗') : ''].filter(Boolean);
-  const svcs = d.services.map(s => s.endpointURL
-    ? `<div class="svc"><div class="mono">${esc(s.title || 'Service')}<br>${esc(s.endpointURL)}</div>
-       <div class="svc-links">${[link(s.endpointDescription, 'Docs ↗'), link(s.conformsTo, 'Protocol ↗')].filter(Boolean).join('')}</div></div>`
-    : `<div class="svc mono">Service ${esc(localName(s.iri))} (not described in the loaded files)</div>`).join('');
-  const derived = derivedLinks(d.derivedFrom);
-  return `<div class="card dist">
-    <div class="dist-head"><div class="dist-title">${esc(d.title || d.id)}</div>
-      ${d.typeLabel ? `<span class="chip">${esc(d.typeLabel)}</span>` : ''}</div>
-    ${fmt ? `<div class="muted mono" style="font-size:12px">${esc(fmt)}</div>` : ''}
-    ${how ? `<div class="dist-how">${esc(how)}</div>` : ''}
-    ${svcs}
-    ${derived.length ? `<div class="derived">${derived.join(' · ')}</div>` : ''}
-    <div class="dist-links">${links.join('')}</div>
-  </div>`;
+  const title = safeUrl(d.accessURL)
+    ? `<a href="${esc(d.accessURL)}" target="_blank" rel="noopener">${esc(d.title || d.id)} ↗</a>` : esc(d.title || d.id);
+  const links = [link(d.downloadURL, 'Download ↓'), d.license ? link(d.license, 'Licence ↗') : ''].filter(Boolean);
+  const where = ctx ? [`<a href="${hrefFor(ctx.c.key)}">${esc(shortTitle(ctx.c.title))}</a>`,
+                       `<a href="${hrefFor(ctx.c.key, ctx.ds.id)}">${esc(ctx.ds.title)}</a>`] : [];
+  const services = d.services.map(s => s.endpointURL
+    ? `<div class="endpoint mono"><div class="ep-title">${esc(s.title || 'Service')}</div>${esc(s.endpointURL)}
+        <div class="ep-links">${[link(s.endpointDescription, 'Docs ↗'), link(s.conformsTo, 'Protocol ↗')].filter(Boolean).join('')}</div></div>`
+    : `<div class="endpoint mono">${esc(localName(s.iri))}</div>`).join('');
+  return `<div class="row">
+    <div class="row-side"><span class="label" style="display:flex;gap:6px;align-items:center">
+      <span style="width:14px;height:14px;display:inline-flex">${icon(d.type)}</span>${esc(d.typeLabel || 'Distribution')}</span>
+      ${fmt ? `<span class="fmt mono">${esc(fmt)}</span>` : ''}</div>
+    <div><div class="row-title">${title}</div>
+      ${how ? `<div class="row-desc">${esc(how)}</div>` : ''}
+      ${services}
+      ${(where.length || links.length || d.derivedFrom.length) ? `<div class="row-meta">${[...where, ...derivedLinks(d.derivedFrom), ...links].map(x => `<span>${x}</span>`).join('')}</div>` : ''}
+    </div></div>`;
 }
 
-function turtleTabs() {
-  return `<div class="tabs"><button class="on" data-tab="summary">Summary</button><button data-tab="raw">Turtle source</button></div>
-          <div id="raw-box" hidden></div>`;
+// ── Turtle source ───────────────────────────────────────────────────────────
+
+function turtleSection() {
+  return `<section><div class="tabs" id="ttl-tabs"><button class="on" data-tab="hide">Summary</button><button data-tab="raw">Turtle source</button></div>
+          <div id="raw-box" hidden></div></section>`;
 }
-function wireTabs(file) {
-  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
-    document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+function wireTurtle(file) {
+  $('ttl-tabs').querySelectorAll('button').forEach(b => b.onclick = () => {
+    $('ttl-tabs').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
     $('raw-box').hidden = b.dataset.tab !== 'raw';
     if (b.dataset.tab === 'raw') $('raw-box').innerHTML = `<pre class="ttl">${esc(sources.get(file) || 'Not loaded.')}</pre>`;
   });
 }
 
 init().catch(e => {
-  $('view').innerHTML = `<div class="card error">Could not load the FAIR Data Point: ${esc(e.message)}</div>`;
+  $('view').innerHTML = `<div class="notice error">Could not load the FAIR Data Point: ${esc(e.message)}</div>`;
 });

@@ -4,24 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Biodiversity FDP</title>
-<meta name="description" content="Browse the Biodiversity FAIR Data Point: every way to get iNaturalist, GBIF, BHL, Plazi, UniProt, OpenStreetMap and GeoNames data.">
+<meta name="description" content="Every way to get biodiversity data: a FAIR Data Point over iNaturalist, GBIF, BHL, Plazi, UniProt, OpenStreetMap and GeoNames.">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
 <link rel="alternate" type="text/turtle" href="fdp/biodiversity-index/catalog.ttl">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/n3@2.13.8/browser/n3.min.js"></script>
 </head>
 <body>
-<div class="header">
-  <div class="brand">
-    <div class="logo">B</div>
-    <div><div class="brand-title" id="brand-title">Biodiversity FDP</div><div class="brand-sub" id="repo-label">FAIR Data Point browser</div></div>
+<header class="topbar">
+  <div class="wrap">
+    <a class="lockup" href="#" id="lockup"></a>
+    <nav class="topnav" id="topnav"></nav>
+    <div class="right" id="topright"></div>
   </div>
-  <div class="nav" id="nav"></div>
-</div>
+</header>
 
-<nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
-<main id="view"><div class="loading"><div class="spinner"></div>Loading the FAIR Data Point…</div></main>
-<footer id="footer"></footer>
+<main class="wrap" id="view"><div class="loading"><div class="spinner"></div>Loading the FAIR Data Point…</div></main>
+
+<footer><div class="wrap" id="footer"></div></footer>
 
 <script src="app.js"></script>
 </body>
