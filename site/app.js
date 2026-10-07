@@ -181,11 +181,11 @@ function locate(target) {
 
 // ── Icons (monochrome, stroke = currentColor) ───────────────────────────────
 
-// A leaf whose veins end in nodes; veins are cut out in the page background colour.
+// A mangrove: lobed crown, arching prop roots standing in water (cf. the Mangal network).
 const LOGO = `<svg viewBox="0 0 24 24" aria-hidden="true">
-  <path d="M3.5 20.5C3.5 10 9 3.5 21 3.5C21 15 14.5 20.5 3.5 20.5Z" fill="currentColor"/>
-  <path d="M5.5 18.5L16.5 7.5M10 14V9.6M13 11H17.4M7.6 16.4H11.6" stroke="var(--logo-cut, var(--bg))" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-  <g fill="var(--logo-cut, var(--bg))"><circle cx="10" cy="8.6" r="1.25"/><circle cx="18.4" cy="11" r="1.25"/><circle cx="12.6" cy="16.4" r="1.25"/><circle cx="17.2" cy="6.8" r="1.25"/></g></svg>`;
+  <g fill="currentColor"><circle cx="7" cy="7.2" r="3.6"/><circle cx="12" cy="5.4" r="4.2"/><circle cx="17" cy="7.2" r="3.6"/><rect x="5" y="7" width="14" height="3.6" rx="1.8"/></g>
+  <path d="M12 10V20.5M12 11.8C8 11.8 4.6 14 3.2 20.5M12 11.8C16 11.8 19.4 14 20.8 20.5M11.6 13.4C9.4 14 7.6 16.4 7.2 20.5M12.4 13.4C14.6 14 16.4 16.4 16.8 20.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+  <path d="M1 17.4H23V23H1Z" fill="currentColor" opacity=".18"/></svg>`;
 
 const ICON_PATHS = {
   'web-portal': '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.5 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3z"/>',
@@ -248,7 +248,7 @@ function renderChrome() {
     (repo ? link(`https://github.com/${repo.org}/${repo.name}#readme`, 'About') : '');
   $('topright').innerHTML = (repo ? `<a class="btn ghost" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}" target="_blank" rel="noopener">GitHub</a>` : '') +
     `<a class="btn" href="${esc(indexModel.file)}" target="_blank" rel="noopener">Turtle</a>`;
-  $('footer').innerHTML = `<div><div class="lockup" style="--logo-cut: var(--tint)">${LOGO}<span>${esc(name)}</span></div>
+  $('footer').innerHTML = `<div><div class="lockup">${LOGO}<span>${esc(name)}</span></div>
       A static FAIR Data Point, rendered in your browser with <a href="https://github.com/rdfjs/N3.js" target="_blank" rel="noopener">N3.js</a>.</div>
     <div>${indexModel.publisher ? 'Curated by ' + esc(indexModel.publisher) + '<br>' : ''}
       Browse another FDP with <span class="mono">?index=&lt;url&gt;</span></div>`;
@@ -297,7 +297,7 @@ function showIndex() {
   const methods = methodsInUse();
 
   let html = `<div class="hero-band"><div class="wrap"><div class="hero">
-      <div class="mark" style="--logo-cut: var(--tint)">${LOGO}</div>
+      <div class="mark">${LOGO}</div>
       <h1>Every way to get <em>biodiversity</em> data</h1>
       <p>${catalogs.length} infrastructures and ${all.length} ways to reach them, from portals and APIs to SPARQL endpoints, bulk dumps and cloud buckets, described as one FAIR Data Point.</p>
       ${searchForm('', '', methods)}
