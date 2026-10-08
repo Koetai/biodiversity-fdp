@@ -14,7 +14,8 @@
     dcterms:publisher :publisher-curator ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
     dcterms:modified "2026-10-07"^^xsd:date ;
-    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods.ttl> , <https://koetai.semscape.org/mangal> , <https://koetai.semscape.org/fdp> ;
+    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods.ttl> ,
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/biodiversity-index/contributors.ttl> , <https://koetai.semscape.org/mangal> , <https://koetai.semscape.org/fdp> ;
     fdp:hasCatalog
         :catalog-inaturalist ,
         :catalog-gbif ,

@@ -95,7 +95,12 @@ The site's Contributors section is rebuilt on every deploy by `scripts/contribut
 - merged pull requests
 - "Add a data source" issues: whoever fills in the form is credited for the catalog, even though the bot makes the commit
 
-Each catalog page shows who added it and who improved it.
+Each catalog page shows who added it and who improved it. The same information is part of the FDP metadata in [`fdp/biodiversity-index/contributors.ttl`](fdp/biodiversity-index/contributors.ttl), which the index links with `rdfs:seeAlso`:
+
+- `dcterms:creator` and `dcterms:contributor` on the index and on each catalog
+- `foaf:Person` nodes with the person's GitHub account, and `owl:sameAs` links to their Wikidata item and ORCID
+
+The deploy regenerates the file and commits it when it changes; don't edit it by hand.
 
 Names come from Wikidata when your GitHub account is linked there. Add **[P2037 (GitHub username)](https://www.wikidata.org/wiki/Property:P2037)** to your Wikidata item, and the next deploy also shows your Wikidata item and ORCID iD. Without it, the name comes from your GitHub profile, or else from your git author name.
 

@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # commit the regenerated contributors.ttl back to main
   pages: write
   id-token: write
 
@@ -28,11 +28,23 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install rdflib && python scripts/validate.py
-      - run: scripts/build-site.sh
       - name: Collect contributors (GitHub history, pull requests, data-source issues, Wikidata)
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python scripts/contributors.py _site/contributors.json
+        run: python scripts/contributors.py "$RUNNER_TEMP/contributors.json" --turtle fdp/biodiversity-index/contributors.ttl
+      - name: Commit contributors.ttl if it changed
+        # Keeps the raw.githubusercontent.com copy of the FDP in step with the site.
+        # A push made with GITHUB_TOKEN does not trigger another workflow run.
+        run: |
+          if ! git diff --quiet -- fdp/biodiversity-index/contributors.ttl || [ -n "$(git status --porcelain fdp/biodiversity-index/contributors.ttl)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add fdp/biodiversity-index/contributors.ttl
+            git commit -m "Update contributors.ttl"
+            git pull --rebase origin main && git push origin HEAD:main || echo "::warning::Could not push contributors.ttl; the site still has the fresh copy."
+          fi
+      - run: scripts/build-site.sh
+      - run: cp "$RUNNER_TEMP/contributors.json" _site/contributors.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

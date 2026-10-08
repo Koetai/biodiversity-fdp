@@ -137,7 +137,9 @@ async function init() {
   for (const r of refs) r.liveRoot = r.file && sources.has(r.file) ? liveRootIn(r.file) : null;
   await Promise.all(refs.filter(r => r.liveRoot).map(r => crawl(r.liveRoot).then(errs => failures.push(...errs))));
 
-  amBase = vocabFiles.length ? vocabFiles[0].replace(/\.ttl$/, '#') : null;
+  // The access-method vocabulary is the linked file that defines a skos:ConceptScheme.
+  const vocab = vocabFiles.find(f => store.getSubjects(namedNode(NS.rdf + 'type'), namedNode(NS.skos + 'ConceptScheme'), namedNode(f)).length);
+  amBase = vocab ? vocab.replace(/\.ttl$/, '#') : null;
   catalogs = refs.map(r => r.liveRoot ? buildLiveCatalog(r) : buildCatalog(r)).filter(Boolean);
   contributors = await loadContributors();
   renderChrome();
