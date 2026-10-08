@@ -3,6 +3,8 @@ name: Deploy viewer to GitHub Pages
 on:
   push:
     branches: [main]
+  issues:
+    types: [opened]     # credit new data-source requests without waiting for a merge
   workflow_dispatch:
 
 permissions:
@@ -16,14 +18,21 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'issues' || contains(github.event.issue.labels.*.name, 'data-source')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history, for contributors.json
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install rdflib && python scripts/validate.py
       - run: scripts/build-site.sh
+      - name: Collect contributors (GitHub history, pull requests, data-source issues, Wikidata)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/contributors.py _site/contributors.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

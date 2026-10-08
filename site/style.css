@@ -177,3 +177,18 @@ footer .lockup svg { width: 22px; height: 22px; }
 
 /* Live FAIR Data Point badge */
 .chip.live { background: var(--green); color: var(--on-green); }
+
+/* Contributors */
+.avatar { border-radius: 50%; background: var(--tint-2); vertical-align: middle; flex-shrink: 0; }
+.people { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.person { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; color: var(--text); background: var(--surface); }
+.person:hover { border-color: var(--green); background: var(--tint); text-decoration: none; }
+.person-name { font-weight: 600; }
+.person.join { border-style: dashed; }
+.person.join .disc { width: 40px; height: 40px; font-size: 22px; font-weight: 600; }
+.credits { color: var(--sub); display: inline-flex; align-items: center; gap: 8px; }
+.credits:hover { color: var(--green); }
+.avatars { display: inline-flex; }
+.avatars .avatar { border: 2px solid var(--tint); margin-left: -6px; }
+.avatars .avatar:first-child { margin-left: 0; }
+.credits-line .avatar { margin-right: 2px; }

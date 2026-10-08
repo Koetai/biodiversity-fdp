@@ -44,6 +44,7 @@ let catalogs = [];
 let failures = [];
 let methodFilter = null;
 let amBase = null;            // namespace of the access-method vocabulary, for inferred types
+let contributors = null;      // contributors.json, generated from the GitHub repository at deploy time
 
 const $ = id => document.getElementById(id);
 const esc = s => s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -138,6 +139,7 @@ async function init() {
 
   amBase = vocabFiles.length ? vocabFiles[0].replace(/\.ttl$/, '#') : null;
   catalogs = refs.map(r => r.liveRoot ? buildLiveCatalog(r) : buildCatalog(r)).filter(Boolean);
+  contributors = await loadContributors();
   renderChrome();
   route();
 }
@@ -195,6 +197,28 @@ function buildDistribution(d) {
       conformsTo: iri(s, NS.dct + 'conformsTo'),
     })),
   });
+}
+
+// ── Contributors ────────────────────────────────────────────────────────────
+
+// Written by scripts/contributors.py during the Pages build; absent when browsing another FDP or locally.
+async function loadContributors() {
+  if (!INDEX_IS_LOCAL) return null;
+  try {
+    const res = await fetch('contributors.json', { cache: 'no-cache' });
+    return res.ok ? await res.json() : null;
+  } catch { return null; }
+}
+const personByLogin = login => (contributors && contributors.people.find(p => p.login === login)) || { login, name: null, avatar: `https://github.com/${login}.png`, url: `https://github.com/${login}` };
+const displayName = p => p.name || '@' + p.login;
+const avatar = (p, size = 28) => `<img class="avatar" src="${esc(p.avatar)}${p.avatar.includes('?') ? '&' : '?'}s=${size * 2}" width="${size}" height="${size}" alt="">`;
+function personSummary(p) {
+  const bits = [];
+  if (p.catalogs.length) bits.push(`${p.catalogs.length} catalog${p.catalogs.length !== 1 ? 's' : ''}`);
+  if (p.pullRequests.length) bits.push(`${p.pullRequests.length} pull request${p.pullRequests.length !== 1 ? 's' : ''}`);
+  if (p.requests.length) bits.push(`${p.requests.length} source request${p.requests.length !== 1 ? 's' : ''}`);
+  if (p.commits) bits.push(`${p.commits} commit${p.commits !== 1 ? 's' : ''}`);
+  return bits.join(' · ');
 }
 
 // ── Live FAIR Data Points ───────────────────────────────────────────────────
@@ -338,6 +362,7 @@ function route() {
   const [path, query] = location.hash.replace(/^#\/?/, '').split('?');
   const [key, ds] = path.split('/').filter(Boolean).map(decodeURIComponent);
   if (key === 'search') showSearch(new URLSearchParams(query || ''));
+  else if (key === 'contributors') showContributors();
   else if (key && ds) showDataset(key, ds);
   else if (key) showCatalog(key);
   else showIndex();
@@ -354,13 +379,14 @@ function renderChrome() {
   const [word, ...rest] = name.split(' ');
   $('lockup').innerHTML = `${LOGO}<span>${esc(word)}${rest.length ? ` <span class="sub">${esc(rest.join(' '))}</span>` : ''}</span>`;
   $('topnav').innerHTML = `<a href="#catalogs">Catalogs</a><a href="${searchHref()}">Search</a>` +
+    (contributors ? '<a href="#/contributors">Contributors</a>' : '') +
     (repo ? link(`https://github.com/${repo.org}/${repo.name}#readme`, 'About') +
             link(`https://github.com/${repo.org}/${repo.name}/issues/new?template=add-data-source.yml`, 'Add a data source') : '');
   $('topright').innerHTML = (repo ? `<a class="btn ghost" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}" target="_blank" rel="noopener">GitHub</a>` : '') +
     `<a class="btn" href="${esc(indexModel.file)}" target="_blank" rel="noopener">Turtle</a>`;
   $('footer').innerHTML = `<div><div class="lockup">${LOGO}<span>${esc(name)}</span></div>
       A static FAIR Data Point, rendered in your browser with <a href="https://github.com/rdfjs/N3.js" target="_blank" rel="noopener">N3.js</a>.</div>
-    <div>${indexModel.publisher ? 'Curated by ' + esc(indexModel.publisher) + '<br>' : ''}
+    <div>${footerCredits()}
       Browse another FDP with <span class="mono">?index=&lt;url&gt;</span></div>`;
   // "Catalogs" in the top bar scrolls on the index, navigates elsewhere.
   $('topnav').querySelector('a[href="#catalogs"]').onclick = e => {
@@ -368,6 +394,15 @@ function renderChrome() {
     if (location.hash.replace(/^#\/?/, '')) { location.hash = ''; setTimeout(() => scrollToId('catalogs'), 0); }
     else scrollToId('catalogs');
   };
+}
+function footerCredits() {
+  if (!contributors || !contributors.people.length)
+    return indexModel.publisher ? 'Curated by ' + esc(indexModel.publisher) + '<br>' : '';
+  const people = contributors.people;
+  const names = people.slice(0, 3).map(displayName);
+  const more = people.length - names.length;
+  return `<a class="credits" href="#/contributors"><span class="avatars">${people.slice(0, 6).map(p => avatar(p, 22)).join('')}</span>
+    Built by ${esc(names.join(', '))}${more > 0 ? ` and ${more} more` : ''}</a><br>`;
 }
 const scrollToId = id => { const el = $(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); };
 
@@ -433,7 +468,17 @@ function showIndex() {
       <div class="chips">${types.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
     </a>`;
   }
-  html += '</div></section>' + turtleSection(indexModel.file) + '</div>';
+  html += '</div></section>';
+  if (contributors && contributors.people.length) {
+    html += `<section id="contributors"><div class="section-head"><h2>Contributors</h2>
+      <span class="count"><a href="#/contributors">All ${contributors.people.length} →</a></span></div><div class="people">` +
+      contributors.people.slice(0, 8).map(p => `<a class="person" href="#/contributors">${avatar(p, 40)}
+        <span><span class="person-name">${esc(displayName(p))}</span><br><span class="tile-n">${esc(personSummary(p))}</span></span></a>`).join('') +
+      (repo ? `<a class="person join" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}/issues/new?template=add-data-source.yml" target="_blank" rel="noopener">
+        <span class="disc">+</span><span><span class="person-name">Add a data source</span><br><span class="tile-n">Fill in a form; a pull request follows</span></span></a>` : '') +
+      '</div></section>';
+  }
+  html += turtleSection(indexModel.file) + '</div>';
   $('view').innerHTML = html;
   wireSearch();
   wireTurtle(indexModel.file);
@@ -478,7 +523,7 @@ function showCatalog(key) {
                 .filter(Boolean).map(x => `<span>${x}</span>`);
   let html = crumbs([{ label: shortTitle(c.title) || key }]) + `<div class="page-head">
     <div class="eyebrow">${c.live ? 'Live FAIR Data Point' : 'Catalog'}</div><h1>${esc(c.title || key)}</h1><p>${esc(c.description || '')}</p>
-    ${meta.length ? `<div class="meta">${meta.join('')}</div>` : ''}${fileButtons(c.file, c.live)}</div>`;
+    ${meta.length ? `<div class="meta">${meta.join('')}</div>` : ''}${catalogCredits(c)}${fileButtons(c.file, c.live)}</div>`;
   html += `<section><div class="section-head"><h2>Datasets</h2><span class="count">${c.datasets.length}</span></div><div class="rows">`;
   for (const ds of c.datasets) {
     const n = ds.distributions.length;
@@ -492,6 +537,50 @@ function showCatalog(key) {
   html += '</div></section>' + turtleSection(c.file);
   $('view').innerHTML = '<div class="wrap">' + html + '</div>';
   wireTurtle(c.file);
+}
+
+function catalogCredits(c) {
+  const info = contributors && contributors.catalogs[c.key];
+  if (!info) return '';
+  const added = personByLogin(info.addedBy);
+  const others = info.contributors.filter(l => l !== info.addedBy).map(personByLogin);
+  return `<div class="meta credits-line"><span>${avatar(added, 20)} Added by <a href="${esc(added.url)}" target="_blank" rel="noopener">${esc(displayName(added))}</a> on ${esc(info.added)}</span>` +
+    (others.length ? `<span>Improved by ${others.map(p => `${avatar(p, 20)} <a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(displayName(p))}</a>`).join(', ')}</span>` : '') +
+    '</div>';
+}
+
+// ── Contributors page ───────────────────────────────────────────────────────
+
+function showContributors() {
+  if (!contributors) { $('view').innerHTML = '<div class="wrap">' + crumbs([]) + '<div class="notice">No contributor information for this FDP.</div></div>'; return; }
+  const catLink = k => { const c = catalogs.find(x => x.key === k); return c ? `<a href="${hrefFor(k)}">${esc(shortTitle(c.title))}</a>` : null; };
+  let html = crumbs([{ label: 'Contributors' }]) + `<div class="page-head"><div class="eyebrow">Contributors</div>
+    <h1>The people behind this FDP</h1>
+    <p>Everyone who added or improved a catalog, merged a pull request or asked for a data source through the form, taken from the
+      ${repo ? `<a href="https://github.com/${esc(repo.org)}/${esc(repo.name)}" target="_blank" rel="noopener">GitHub repository</a>` : 'repository'}
+      and refreshed on every deploy (${esc(contributors.generated.slice(0, 10))}). Names, Wikidata items and ORCID iDs come from
+      Wikidata when the GitHub account is linked there with property
+      <a href="https://www.wikidata.org/wiki/Property:P2037" target="_blank" rel="noopener">P2037 (GitHub username)</a>.</p>
+    ${repo ? `<div class="actions"><a class="btn" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}/issues/new?template=add-data-source.yml" target="_blank" rel="noopener">Add a data source</a>
+      <a class="btn ghost" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">How to contribute</a></div>` : ''}
+  </div><section><div class="rows">`;
+  for (const p of contributors.people) {
+    const cats = p.catalogs.map(catLink).filter(Boolean);
+    const prs = p.pullRequests.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener">#${x.number} ${esc(x.title)}</a>`);
+    const reqs = p.requests.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener">#${x.number} ${esc(x.title)}</a>`);
+    html += `<div class="row">
+      <div class="row-side">${avatar(p, 56)}</div>
+      <div><div class="row-title"><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(displayName(p))}</a>
+        ${p.name ? `<span class="fmt mono"> @${esc(p.login)}</span>` : ''}</div>
+        <div class="row-meta">${[link(p.url, 'GitHub ↗'), p.wikidata ? link(p.wikidata, 'Wikidata ' + localName(p.wikidata) + ' ↗') : '',
+          p.orcid ? link('https://orcid.org/' + p.orcid, 'ORCID ' + p.orcid + ' ↗') : ''].filter(Boolean).map(x => `<span>${x}</span>`).join('')}</div>
+        <div class="row-desc">${esc(personSummary(p))}${p.since ? ` · since ${esc(p.since)}` : ''}</div>
+        ${cats.length ? `<div class="row-meta"><span>Catalogs: ${cats.join(', ')}</span></div>` : ''}
+        ${prs.length ? `<div class="row-meta"><span>Pull requests: ${prs.join(', ')}</span></div>` : ''}
+        ${reqs.length ? `<div class="row-meta"><span>Requested: ${reqs.join(', ')}</span></div>` : ''}
+      </div></div>`;
+  }
+  $('view').innerHTML = '<div class="wrap">' + html + '</div></section></div>';
 }
 
 // ── Dataset ─────────────────────────────────────────────────────────────────

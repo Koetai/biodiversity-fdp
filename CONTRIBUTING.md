@@ -86,3 +86,16 @@ The script refuses invalid slugs, URLs or media types, unknown access methods, a
 - **Copies in aggregators** (GBIF, QLever, Koetai…) are distributions of the original dataset, typed `aggregator-mirror` or by their access method, with `prov:wasDerivedFrom` pointing at what they were derived from. Provenance is kept, not deduplicated.
 - **Verify before you write.** Check that URLs resolve and that endpoints answer a real query. Record counts and dates as "on YYYY-MM-DD". If something is broken, say so in the description rather than leaving it out.
 - All IRIs use the base `https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/`. If the repository moves, run `scripts/set-base.sh <org> <repo> [branch]`.
+
+## Credit
+
+The site's Contributors section is rebuilt on every deploy by `scripts/contributors.py`. It draws on:
+
+- the git history
+- merged pull requests
+- "Add a data source" issues: whoever fills in the form is credited for the catalog, even though the bot makes the commit
+
+Each catalog page shows who added it and who improved it.
+
+Names come from Wikidata when your GitHub account is linked there. Add **[P2037 (GitHub username)](https://www.wikidata.org/wiki/Property:P2037)** to your Wikidata item, and the next deploy also shows your Wikidata item and ORCID iD. Without it, the name comes from your GitHub profile, or else from your git author name.
+
