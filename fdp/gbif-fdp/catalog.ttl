@@ -34,7 +34,7 @@
     dcterms:title "GBIF occurrence data — live index"@en ;
     dcterms:description "All occurrences currently indexed by GBIF (3 956 888 741 on 2026-10-06). Each record keeps its publisher licence: CC0, CC BY or CC BY-NC."@en ;
     dcterms:identifier "GBIF-occurrence-live" ;
-    dcterms:version "live (described 2026-10-06)" ;
+    dcat:version "live (described 2026-10-06)" ;
     dcterms:modified "2026-10-06"^^xsd:date ;
     dcterms:publisher :publisher-gbif ;
     dcterms:rights <https://www.gbif.org/terms> ;
@@ -96,7 +96,7 @@
     dcterms:title "GBIF monthly occurrence snapshot 2026-10-01"@en ;
     dcterms:description "Monthly frozen export of all CC0 and CC BY occurrences (CC BY-NC records are excluded) as Parquet, mirrored in five AWS regions. Cite via the citation.txt in the snapshot folder."@en ;
     dcterms:identifier "GBIF-snapshot-2026-10-01" ;
-    dcterms:version "2026-10-01" ;
+    dcat:version "2026-10-01" ;
     dcterms:issued "2026-10-01"^^xsd:date ;
     dcterms:publisher :publisher-gbif ;
     dcat:landingPage <https://registry.opendata.aws/gbif/> ;
@@ -120,7 +120,7 @@
     dcterms:title "GBIF monthly occurrence snapshot 2026-09-01"@en ;
     dcterms:description "Previous monthly snapshot (CC0 and CC BY records only). Older snapshots stay in the buckets for reproducibility."@en ;
     dcterms:identifier "GBIF-snapshot-2026-09-01" ;
-    dcterms:version "2026-09-01" ;
+    dcat:version "2026-09-01" ;
     dcterms:issued "2026-09-01"^^xsd:date ;
     dcterms:publisher :publisher-gbif ;
     dcat:landingPage <https://registry.opendata.aws/gbif/> ;
@@ -144,7 +144,7 @@
     dcterms:title "GBIF Backbone Taxonomy 2023-08-28"@en ;
     dcterms:description "The taxonomic backbone every GBIF occurrence is matched to (doi:10.15468/39omei)."@en ;
     dcterms:identifier "https://doi.org/10.15468/39omei" ;
-    dcterms:version "2023-08-28" ;
+    dcat:version "2023-08-28" ;
     dcterms:issued "2023-08-28"^^xsd:date ;
     dcterms:publisher :publisher-gbif ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;

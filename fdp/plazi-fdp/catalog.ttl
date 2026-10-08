@@ -34,7 +34,7 @@
     dcterms:title "Plazi TreatmentBank"@en ;
     dcterms:description "Treatments extracted from taxonomic publications, each with a persistent identifier http://treatment.plazi.org/id/UUID, plus the material citations, figures and names they contain."@en ;
     dcterms:identifier "Plazi-TreatmentBank" ;
-    dcterms:version "live (described 2026-10-06)" ;
+    dcat:version "live (described 2026-10-06)" ;
     dcterms:publisher :publisher-plazi ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
     dcat:landingPage <https://plazi.org/treatmentbank/> ;
@@ -130,7 +130,7 @@
     dcterms:title "Biodiversity Literature Repository (BLR) on Zenodo"@en ;
     dcterms:description "Plazi deposits treatments, figures and articles in the Zenodo community biosyslit, each with its own DOI."@en ;
     dcterms:identifier "BLR" ;
-    dcterms:version "live (described 2026-10-06)" ;
+    dcat:version "live (described 2026-10-06)" ;
     dcterms:publisher :publisher-plazi ;
     dcat:landingPage <https://zenodo.org/communities/biosyslit> ;
     dcat:distribution :dist-blr-web , :dist-blr-api , :dist-blr-oai .

@@ -170,7 +170,7 @@ function buildDataset(ds) {
   return {
     iri: ds, id: localName(ds),
     title: lit(ds, NS.dct + 'title'), description: lit(ds, NS.dct + 'description'),
-    version: lit(ds, NS.dct + 'version') || lit(ds, NS.dct + 'hasVersion'),
+    version: lit(ds, NS.dcat + 'version') || lit(ds, NS.dct + 'version') || lit(ds, NS.dct + 'hasVersion'),
     issued: lit(ds, NS.dct + 'issued') || (lit(ds, NS.fdp + 'metadataIssued') || '').slice(0, 10) || null,
     modified: lit(ds, NS.dct + 'modified') || (lit(ds, NS.fdp + 'metadataModified') || '').slice(0, 10) || null,
     identifier: value(ds, NS.dct + 'identifier'), landingPage: iri(ds, NS.dcat + 'landingPage'),

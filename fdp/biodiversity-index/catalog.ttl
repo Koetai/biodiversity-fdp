@@ -5,6 +5,8 @@
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
 @prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix ldp:     <http://www.w3.org/ns/ldp#> .
+@prefix pim:     <http://www.w3.org/2000/10/swap/pim/doc#> .
 @prefix :        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/biodiversity-index/> .
 
 <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/biodiversity-index/>
@@ -12,10 +14,23 @@
     dcterms:title "Biodiversity FDP — overarching index"@en ;
     dcterms:description "Static FAIR Data Point index over biodiversity infrastructures. Each sub-catalog describes one resource and lists every way to obtain it: native portal and APIs, bulk files, cloud buckets and copies in aggregators (GBIF, QLever, Koetai). Provenance is preserved, not deduplicated: the iNaturalist subset in GBIF appears under both."@en ;
     dcterms:publisher :publisher-curator ;
+    dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/biodiversity-index/" ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcat:landingPage <https://koetai.github.io/biodiversity-fdp/> ;
+    pim:persistencePolicy <https://github.com/Koetai/biodiversity-fdp/blob/main/PERSISTENCE.md> ;
     dcterms:modified "2026-10-07"^^xsd:date ;
     rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods.ttl> ,
         <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/biodiversity-index/contributors.ttl> , <https://koetai.semscape.org/mangal> , <https://koetai.semscape.org/fdp> ;
+    # The catalog documents themselves, for clients that follow LDP containment.
+    ldp:contains
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog.ttl> ,
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> ,
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/catalog.ttl> ,
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/catalog.ttl> ,
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl> ,
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/openstreetmap-fdp/catalog.ttl> ,
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl> ,
+        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/catalog.ttl> ;
     fdp:hasCatalog
         :catalog-inaturalist ,
         :catalog-gbif ,

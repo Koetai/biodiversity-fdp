@@ -34,7 +34,7 @@
     dcterms:title "BGV-UPM germplasm collection — BGV June 2023"@en ;
     dcterms:description "César Gómez Campo Banco de Germoplasma Vegetal de la UPM (Madrid). About 10 000 seed accessions of 3 500 wild plant species, the founding member of FLAIR-GG. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
     dcterms:identifier "https://w3id.org/bgv-fdp" ;
-    dcterms:version "2023-06" ;
+    dcat:version "2023-06" ;
     dcterms:issued "2023-06-28"^^xsd:date ;
     dcterms:publisher :publisher-bgv ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
@@ -121,7 +121,7 @@
     dcterms:title "BGUSAL germplasm collection — BGUSAL February 2025"@en ;
     dcterms:description "Banco de Germoplasma de la Universidad de Salamanca. Seeds of threatened flora of Castilla y León and spores and mycelium of fungi, hosted at CIALE since 2007. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
     dcterms:identifier "https://bgusal.linkeddata.systems" ;
-    dcterms:version "2025-02" ;
+    dcat:version "2025-02" ;
     dcterms:publisher :publisher-bgusal ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://bgusal.linkeddata.systems> ;
@@ -187,7 +187,7 @@
     dcterms:title "BG-JBCLM germplasm collection — JBCLM October 2025"@en ;
     dcterms:description "Banco de Germoplasma del Jardín Botánico de Castilla-La Mancha. Seed bank of wild and threatened flora of Castilla-La Mancha, started in 2007. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
     dcterms:identifier "https://jbclm.linkeddata.systems" ;
-    dcterms:version "2025-10" ;
+    dcat:version "2025-10" ;
     dcterms:publisher :publisher-jbclm ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://jbclm.linkeddata.systems> ;
@@ -253,7 +253,7 @@
     dcterms:title "JBO germplasm collection — JBO August 2024"@en ;
     dcterms:description "Banco de Germoplasma del Jardín Botánico de Olarizu (Vitoria-Gasteiz). Threatened, endemic and rare wild flora and habitats of community interest of the Basque Country and surroundings. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
     dcterms:identifier "https://jbo.linkeddata.systems" ;
-    dcterms:version "2024-08" ;
+    dcat:version "2024-08" ;
     dcterms:publisher :publisher-jbo ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://jbo.linkeddata.systems> ;
@@ -329,7 +329,7 @@
     dcterms:title "JBS germplasm collection — JBS February 2025"@en ;
     dcterms:description "Banco de Germoplasma del Jardí Botànic de Sóller (Mallorca). Mediterranean and especially Balearic flora; the garden was founded in 1985. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
     dcterms:identifier "https://jbs.linkeddata.systems" ;
-    dcterms:version "2025-02" ;
+    dcat:version "2025-02" ;
     dcterms:publisher :publisher-jbs ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://jbs.linkeddata.systems> ;
@@ -395,7 +395,7 @@
     dcterms:title "BG URJC germplasm collection — BG URJC Nov 2024"@en ;
     dcterms:description "Banco de Germoplasma de la Universidad Rey Juan Carlos (Madrid). 512 accessions of 222 wild species in four collections: high mountain, semi-arid, Lupinus and Canary Islands; founded 2008. Data follow the FLAIR-GG semantic model (FAO/IPGRI multi-crop passport descriptors, SIO, Darwin Core, WFO taxonomy)."@en ;
     dcterms:identifier "https://urjc.linkeddata.systems" ;
-    dcterms:version "2024-11" ;
+    dcat:version "2024-11" ;
     dcterms:publisher :publisher-urjc ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://urjc.linkeddata.systems> ;
@@ -471,7 +471,7 @@
     dcterms:title "FLAIR-GG Virtual Platform — federated access to all members"@en ;
     dcterms:description "The Virtual Platform indexes the FAIR Data Points of all member banks plus third-party services and runs federated queries and analytics over them. It also federates UniProt SPARQL (described in the UniProt catalog of this FDP)."@en ;
     dcterms:identifier "FLAIR-GG-VP" ;
-    dcterms:version "live (described 2026-10-07)" ;
+    dcat:version "live (described 2026-10-07)" ;
     dcterms:publisher :publisher-flairgg ;
     dcat:landingPage <https://wilkinsonlab.github.io/FLAIR-GG/VP/index.html> ;
     rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl> ;
@@ -542,7 +542,7 @@
     dcterms:title "FLAIR-GG semantic model, templates and FLAIR-in-a-Box"@en ;
     dcterms:description "Everything a new bank needs to join: the FAO/IPGRI multi-crop passport descriptor ontology, CSV input templates with paired YARRRML mappings for the germplasm, location and administrative models, and FLAIR-in-a-Box, which installs a triplestore, FAIR Data Point and APIs in one go."@en ;
     dcterms:identifier "FLAIR-GG-semantic-model" ;
-    dcterms:version "main (described 2026-10-07)" ;
+    dcat:version "main (described 2026-10-07)" ;
     dcterms:publisher :publisher-flairgg ;
     dcterms:license <https://opensource.org/license/mit> ;
     dcat:landingPage <https://wilkinsonlab.github.io/FLAIR-GG/SemanticModel/index.html> ;
@@ -606,7 +606,7 @@
     dcterms:title "World Flora Online taxonomic backbone (as used by FLAIR-GG)"@en ;
     dcterms:description "The WFO plant taxonomy that FLAIR-GG uses to reconcile species names across banks; every germplasm record points to a WFO identifier."@en ;
     dcterms:identifier "https://w3id.org/bgv-fdp/dataset/7f92e351-bd11-4941-8bcb-4a9046038cb0" ;
-    dcterms:version "current" ;
+    dcat:version "current" ;
     dcterms:publisher :publisher-wfo ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
     dcat:landingPage <https://www.worldfloraonline.org> ;

@@ -43,6 +43,29 @@ for cat in merged.objects(None, FDPO.hasCatalog):
             if not glob.glob(local):
                 errors.append(f"{cat}: rdfs:seeAlso points at {local}, which does not exist")
 
+# ldp:contains on the index must list exactly the documents its fdp:hasCatalog entries point at.
+LDP = Namespace("http://www.w3.org/ns/ldp#")
+for root in set(merged.subjects(FDPO.hasCatalog, None)):
+    contained = {str(o) for o in merged.objects(root, LDP.contains)}
+    if contained:
+        expected = {str(t) for c in merged.objects(root, FDPO.hasCatalog) for t in merged.objects(c, RDFS_SEEALSO)}
+        for x in sorted(expected - contained):
+            errors.append(f"{root}: ldp:contains is missing {x}")
+        for x in sorted(contained - expected):
+            errors.append(f"{root}: ldp:contains lists {x}, which no fdp:hasCatalog entry points at")
+
+# Every DCMI Terms and FOAF term used must exist in that vocabulary (e.g. there is no dcterms:version;
+# use dcat:version). DCAT is not checked: rdflib ships DCAT 2, which lacks DCAT 3 terms such as dcat:version.
+from rdflib.namespace import DCTERMS as _DCT, FOAF as _FOAF
+for t in {str(x) for triple in merged for x in triple[1:]}:
+    for ns in (_DCT, _FOAF):
+        base = str(ns._NS)
+        if t.startswith(base) and len(t) > len(base):
+            try:
+                getattr(ns, t[len(base):])
+            except AttributeError:
+                errors.append(f"{t} is not defined in {base}")
+
 n = lambda t: len(set(merged.subjects(RDF.type, t)))
 print(f"\n{n(DCAT.Catalog)} catalogs, {n(DCAT.Dataset)} datasets, {n(DCAT.Distribution)} distributions, {n(DCAT.DataService)} services")
 print("\n".join(errors) or "no problems found")

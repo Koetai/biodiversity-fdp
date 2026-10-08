@@ -34,7 +34,7 @@
     dcterms:title "OpenStreetMap — live database"@en ;
     dcterms:description "The continuously edited OSM database, reachable through the editing API, read-only query services and minutely change feeds."@en ;
     dcterms:identifier "OSM-live" ;
-    dcterms:version "live (described 2026-10-06)" ;
+    dcat:version "live (described 2026-10-06)" ;
     dcterms:publisher :publisher-osmf ;
     dcterms:license <https://opendatacommons.org/licenses/odbl/1-0/> ;
     dcat:landingPage <https://www.openstreetmap.org> ;
@@ -90,7 +90,7 @@
     dcterms:title "OpenStreetMap planet 2026-09-28"@en ;
     dcterms:description "Weekly full-planet export (planet-260928)."@en ;
     dcterms:identifier "OSM-planet-260928" ;
-    dcterms:version "260928" ;
+    dcat:version "260928" ;
     dcterms:issued "2026-09-28"^^xsd:date ;
     dcterms:publisher :publisher-osmf ;
     dcterms:license <https://opendatacommons.org/licenses/odbl/1-0/> ;
@@ -141,7 +141,7 @@
     dcterms:title "OpenStreetMap as RDF (osm2rdf)"@en ;
     dcterms:description "The planet converted to RDF by osm2rdf (University of Freiburg): every node, way and relation with its tags, WKT geometries and precomputed GeoSPARQL relations (ogc:sfContains, ogc:sfIntersects)."@en ;
     dcterms:identifier "OSM-RDF-osm2rdf" ;
-    dcterms:version "rolling (described 2026-10-06)" ;
+    dcat:version "rolling (described 2026-10-06)" ;
     dcterms:publisher :publisher-freiburg ;
     dcterms:license <https://opendatacommons.org/licenses/odbl/1-0/> ;
     dcat:landingPage <https://github.com/ad-freiburg/osm2rdf> ;

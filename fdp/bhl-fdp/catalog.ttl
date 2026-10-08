@@ -34,7 +34,7 @@
     dcterms:title "Biodiversity Heritage Library — native collection"@en ;
     dcterms:description "The BHL corpus and its bibliographic and name-index metadata as served by BHL itself."@en ;
     dcterms:identifier "BHL" ;
-    dcterms:version "live (described 2026-10-06)" ;
+    dcat:version "live (described 2026-10-06)" ;
     dcterms:publisher :publisher-bhl ;
     dcterms:rights <https://about.biodiversitylibrary.org/help/copyright-and-reuse/> ;
     dcat:landingPage <https://www.biodiversitylibrary.org> ;
@@ -83,7 +83,7 @@
     dcterms:title "BHL as RDF on Koetai"@en ;
     dcterms:description "RDF conversion of the BHL data.zip export (items, titles, creators, parts, subjects, page-level scientific-name mentions), loaded in QLever on koetai.semscape.org."@en ;
     dcterms:identifier "https://koetai.semscape.org/fdp/dataset/0000-0001-9773-4008/bhl" ;
-    dcterms:version "1.0" ;
+    dcat:version "1.0" ;
     dcterms:issued "2026-09-15"^^xsd:date ;
     dcterms:publisher :publisher-curator ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
@@ -151,7 +151,7 @@
     dcterms:title "BHL (sample) as RDF on Koetai"@en ;
     dcterms:description "Small but structurally complete sample of the BHL RDF (whole titles with all their items, pages, parts and creators), same schema as the full graph. Meant for schema discovery and whole-graph tools."@en ;
     dcterms:identifier "https://koetai.semscape.org/fdp/dataset/0000-0001-9773-4008/bhl-sample" ;
-    dcterms:version "1.0" ;
+    dcat:version "1.0" ;
     dcterms:issued "2026-09-28"^^xsd:date ;
     dcterms:publisher :publisher-curator ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;

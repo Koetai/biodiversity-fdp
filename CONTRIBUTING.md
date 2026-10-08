@@ -82,6 +82,7 @@ The script refuses invalid slugs, URLs or media types, unknown access methods, a
   - a `dcterms:description` that starts with **"How to get it:"**: a concrete recipe (URL pattern, CLI command, required parameters, account or key needed)
   - `dcat:accessURL`, plus `dcat:downloadURL` for a single file
 - **Endpoints** get a `dcat:DataService` (via `dcat:accessService`) with `dcat:endpointURL`, `dcat:endpointDescription` (OpenAPI or docs) and `dcterms:conformsTo` (e.g. the SPARQL 1.1 protocol).
+- **Versions** use `dcat:version` (DCAT 3). There is no `dcterms:version`; `validate.py` rejects terms that DCMI Terms or FOAF don't define.
 - **Media types** are IANA IRIs (`https://www.iana.org/assignments/media-types/…`). Formats come from the EU file-type authority.
 - **Copies in aggregators** (GBIF, QLever, Koetai…) are distributions of the original dataset, typed `aggregator-mirror` or by their access method, with `prov:wasDerivedFrom` pointing at what they were derived from. Provenance is kept, not deduplicated.
 - **Verify before you write.** Check that URLs resolve and that endpoints answer a real query. Record counts and dates as "on YYYY-MM-DD". If something is broken, say so in the description rather than leaving it out.

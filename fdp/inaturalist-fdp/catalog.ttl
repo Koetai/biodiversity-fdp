@@ -34,7 +34,7 @@
     dcterms:title "iNaturalist observations"@en ;
     dcterms:description "All observations on iNaturalist (live database). Licence is chosen per observation and per photo by the observer (CC0, CC BY, CC BY-NC or all rights reserved); only CC0 / CC BY / CC BY-NC research-grade records flow on to GBIF."@en ;
     dcterms:identifier "iNat-observations" ;
-    dcterms:version "live (described 2026-10-06)" ;
+    dcat:version "live (described 2026-10-06)" ;
     dcterms:modified "2026-10-06"^^xsd:date ;
     dcterms:publisher :publisher-inat ;
     dcterms:rights <https://www.inaturalist.org/pages/terms> ;
@@ -145,7 +145,7 @@
     dcterms:title "iNaturalist taxonomy"@en ;
     dcterms:description "The taxon tree used on iNaturalist (names, ranks, common names, external links), regenerated regularly."@en ;
     dcterms:identifier "iNat-taxonomy" ;
-    dcterms:version "live (described 2026-10-06)" ;
+    dcat:version "live (described 2026-10-06)" ;
     dcterms:publisher :publisher-inat ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     dcat:landingPage <https://www.inaturalist.org/taxa> ;

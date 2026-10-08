@@ -181,7 +181,7 @@ def catalog_ttl(s, base, today):
         block = [f":{ds_id}", "    a dcat:Dataset ;", f"    dcterms:title {lit(ds['title'])} ;"]
         if ds.get("description"):
             block.append(f"    dcterms:description {lit(ds['description'])} ;")
-        block.append(f"    dcterms:version {lit(ds.get('version') or 'live (described ' + today + ')', None)} ;")
+        block.append(f"    dcat:version {lit(ds.get('version') or 'live (described ' + today + ')', None)} ;")
         if ds.get("issued"):
             block.append(f'    dcterms:issued "{ds["issued"]}"^^xsd:date ;')
         block.append("    dcterms:publisher :publisher-source ;")
@@ -237,6 +237,10 @@ def register_in_index(s, base, today):
     if not m:
         raise SystemExit("Could not find fdp:hasCatalog in the index")
     text = text[:m.end(1)] + f" ,\n        :{entry}" + text[m.end(1):]
+    # Keep ldp:contains (the catalog documents) in step with fdp:hasCatalog.
+    m = re.search(r"(ldp:contains\b[^;]*?)(\s*;)", text, re.S)
+    if m:
+        text = text[:m.end(1)] + f" ,\n        <{target}>" + text[m.end(1):]
     block = [f":{entry}", "    a dcat:Catalog ;", f"    dcterms:title {lit(s['title'])} ;"]
     if s.get("license"):
         block.append(f"    dcterms:license <{s['license']}> ;")
