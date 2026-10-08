@@ -42,6 +42,14 @@ Each distribution carries:
 
 URIs resolve as `https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/{folder}/`.
 
+## Adding a data source
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). In short:
+
+1. **[Issue form](https://github.com/Koetai/biodiversity-fdp/issues/new?template=add-data-source.yml)**: describe a source in a form. A workflow generates the Turtle and opens a pull request.
+2. **Live FAIR Data Point**: point an index entry at a source's own FDP. The viewer crawls it in the browser, so it is always current.
+3. **By hand, or with `scripts/add_source.py`** and a JSON spec.
+
 ## Housekeeping
 
 ```bash

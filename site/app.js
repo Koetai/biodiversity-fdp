@@ -4,6 +4,11 @@
 // index → catalog → dataset → distributions. No server, no build step.
 //
 // ?index=<url> browses another FDP laid out the same way.
+//
+// An index entry whose rdfs:seeAlso points at a live FAIR Data Point (not a
+// catalog.ttl file) is crawled link by link: FDP → catalogs → datasets and data
+// services → distributions → access services. Missing access-method types are
+// inferred, so live FDPs render like the curated catalogs.
 
 const NS = {
   rdf:  'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
@@ -17,7 +22,13 @@ const NS = {
 };
 const IANA = 'https://www.iana.org/assignments/media-types/';
 const EU_FILE_TYPE = 'http://publications.europa.eu/resource/authority/file-type/';
-const ORDERED = new Set([NS.fdp + 'hasCatalog', NS.dcat + 'dataset', NS.dcat + 'distribution', NS.dcat + 'accessService']);
+const ORDERED = new Set([NS.fdp + 'hasCatalog', NS.fdp + 'metadataCatalog', NS.dcat + 'catalog', NS.dcat + 'dataset',
+                         NS.dcat + 'service', NS.dcat + 'distribution', NS.dcat + 'accessService']);
+// Links followed when crawling a live FDP, and the limits that keep a slow or huge FDP from stalling the page.
+const CRAWL_LINKS = [NS.fdp + 'metadataCatalog', NS.dcat + 'catalog', NS.dcat + 'dataset', NS.dcat + 'service',
+                     NS.dcat + 'distribution', NS.dcat + 'accessService'];
+const CRAWL_MAX_DOCS = 200;
+const FETCH_TIMEOUT_MS = 12000;
 
 const INDEX = new URLSearchParams(location.search).get('index') || 'fdp/biodiversity-index/catalog.ttl';
 const INDEX_IS_LOCAL = !/^https?:\/\//i.test(INDEX);
@@ -32,6 +43,7 @@ let indexModel = null;
 let catalogs = [];
 let failures = [];
 let methodFilter = null;
+let amBase = null;            // namespace of the access-method vocabulary, for inferred types
 
 const $ = id => document.getElementById(id);
 const esc = s => s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -49,7 +61,16 @@ function fetchLocation(iri) {
 
 async function load(iri) {
   if (sources.has(iri)) return;
-  const res = await fetch(fetchLocation(iri), { headers: { Accept: 'text/turtle' } });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
+  let res;
+  try {
+    res = await fetch(fetchLocation(iri.split('#')[0]), { headers: { Accept: 'text/turtle' }, signal: ctrl.signal });
+  } catch (e) {
+    throw new Error(`${iri}: ${e.name === 'AbortError' ? 'timed out' : 'unreachable (network or CORS)'}`);
+  } finally {
+    clearTimeout(timer);
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${iri}`);
   const text = await res.text();
   sources.set(iri, text);
@@ -111,7 +132,12 @@ async function init() {
   const results = await Promise.allSettled([...refs.filter(r => r.file).map(r => load(r.file)), ...vocabFiles.map(load)]);
   failures = results.filter(r => r.status === 'rejected').map(r => r.reason.message);
 
-  catalogs = refs.map(r => buildCatalog(r)).filter(Boolean);
+  // Entries that point at a live FAIR Data Point rather than a catalog file: crawl them.
+  for (const r of refs) r.liveRoot = r.file && sources.has(r.file) ? liveRootIn(r.file) : null;
+  await Promise.all(refs.filter(r => r.liveRoot).map(r => crawl(r.liveRoot).then(errs => failures.push(...errs))));
+
+  amBase = vocabFiles.length ? vocabFiles[0].replace(/\.ttl$/, '#') : null;
+  catalogs = refs.map(r => r.liveRoot ? buildLiveCatalog(r) : buildCatalog(r)).filter(Boolean);
   renderChrome();
   route();
 }
@@ -140,7 +166,9 @@ function buildDataset(ds) {
   return {
     iri: ds, id: localName(ds),
     title: lit(ds, NS.dct + 'title'), description: lit(ds, NS.dct + 'description'),
-    version: lit(ds, NS.dct + 'version'), issued: lit(ds, NS.dct + 'issued'), modified: lit(ds, NS.dct + 'modified'),
+    version: lit(ds, NS.dct + 'version') || lit(ds, NS.dct + 'hasVersion'),
+    issued: lit(ds, NS.dct + 'issued') || (lit(ds, NS.fdp + 'metadataIssued') || '').slice(0, 10) || null,
+    modified: lit(ds, NS.dct + 'modified') || (lit(ds, NS.fdp + 'metadataModified') || '').slice(0, 10) || null,
     identifier: value(ds, NS.dct + 'identifier'), landingPage: iri(ds, NS.dcat + 'landingPage'),
     license: iri(ds, NS.dct + 'license'), derivedFrom: iris(ds, NS.prov + 'wasDerivedFrom'),
     distributions: iris(ds, NS.dcat + 'distribution').map(buildDistribution),
@@ -151,7 +179,7 @@ function buildDistribution(d) {
   const type = iri(d, NS.dct + 'type');
   const media = value(d, NS.dcat + 'mediaType');
   const format = value(d, NS.dct + 'format');
-  return {
+  return withInferredType({
     iri: d, id: localName(d),
     title: lit(d, NS.dct + 'title'), description: lit(d, NS.dct + 'description'),
     type, typeLabel: type ? (lit(type, NS.skos + 'prefLabel') || localName(type)) : null,
@@ -166,7 +194,88 @@ function buildDistribution(d) {
       endpointDescription: iri(s, NS.dcat + 'endpointDescription'),
       conformsTo: iri(s, NS.dct + 'conformsTo'),
     })),
+  });
+}
+
+// ── Live FAIR Data Points ───────────────────────────────────────────────────
+
+// The FDP root described in a fetched document: a subject that lists catalogs.
+function liveRootIn(file) {
+  const g = namedNode(file);
+  const subjects = [NS.fdp + 'metadataCatalog', NS.dcat + 'catalog']
+    .flatMap(p => store.getSubjects(namedNode(p), null, g).map(t => t.value));
+  if (!subjects.length) return null;
+  return subjects.find(x => x.replace(/\/$/, '') === file.replace(/\/$/, '')) || subjects[0];
+}
+
+// Breadth-first over the FDP's own links. Returns error messages, never throws.
+async function crawl(root) {
+  const seen = new Set([root]), errors = [];
+  let frontier = [root];
+  while (frontier.length && seen.size <= CRAWL_MAX_DOCS) {
+    const next = [];
+    for (const s of frontier)
+      for (const p of CRAWL_LINKS)
+        for (const o of iris(s, p)) if (!seen.has(o) && seen.size < CRAWL_MAX_DOCS) { seen.add(o); next.push(o); }
+    const results = await Promise.allSettled(next.map(u => load(u)));
+    results.forEach(r => { if (r.status === 'rejected') errors.push(r.reason.message); });
+    frontier = next;
+  }
+  return errors.slice(0, 5);
+}
+
+function buildLiveCatalog({ ref, file, title, liveRoot: root }) {
+  const fdpCatalogs = [...iris(root, NS.fdp + 'metadataCatalog'), ...iris(root, NS.dcat + 'catalog')];
+  const datasets = [];
+  for (const c of fdpCatalogs) {
+    const group = lit(c, NS.dct + 'title') || localName(c);
+    for (const ds of iris(c, NS.dcat + 'dataset')) datasets.push({ ...buildDataset(ds), group });
+    const services = iris(c, NS.dcat + 'service');
+    if (services.length) datasets.push({
+      iri: c + '#services', id: localName(c) + '-services', group,
+      title: `${group} — data services`, version: 'services',
+      description: lit(c, NS.dct + 'description'), derivedFrom: [],
+      distributions: services.map(serviceAsDistribution),
+    });
+  }
+  return {
+    key: localName(ref), ref, file, iri: root, live: true,
+    title: title || lit(root, NS.dct + 'title'),
+    description: lit(root, NS.dct + 'description'),
+    landingPage: iri(root, NS.dcat + 'landingPage') || root,
+    license: iri(root, NS.dct + 'license'),
+    publisher: lit(iri(root, NS.dct + 'publisher') || '', NS.foaf + 'name'),
+    modified: (lit(root, NS.fdp + 'metadataModified') || '').slice(0, 10) || null,
+    catalogCount: fdpCatalogs.length,
+    datasets,
   };
+}
+
+// A dcat:DataService listed directly under a catalog, shown as one way to get data.
+function serviceAsDistribution(s) {
+  const d = {
+    iri: s, id: localName(s), title: lit(s, NS.dct + 'title'), description: lit(s, NS.dct + 'description'),
+    mediaType: null, format: null, accessURL: iri(s, NS.dcat + 'endpointURL') || iri(s, NS.dcat + 'landingPage'),
+    downloadURL: null, license: iri(s, NS.dct + 'license'), identifier: null, derivedFrom: [],
+    services: [{ iri: s, title: lit(s, NS.dct + 'title'), endpointURL: iri(s, NS.dcat + 'endpointURL'),
+                 endpointDescription: iri(s, NS.dcat + 'endpointDescription'), conformsTo: iri(s, NS.dct + 'conformsTo') }],
+  };
+  return withInferredType(d);
+}
+
+// Remote FDPs rarely type their distributions with our access-method vocabulary; guess one from the
+// media type, endpoint and service, and mark it as inferred.
+function withInferredType(d) {
+  if (d.type || !amBase) return d;
+  const url = [d.accessURL, ...d.services.map(s => s.endpointURL)].filter(Boolean).join(' ');
+  const mt = (d.mediaType || '') + ' ' + (d.format || '');
+  let m = 'web-portal';
+  if (/sparql/i.test(mt) || /\/sparql\b|\/repositories\//i.test(url)) m = 'sparql-endpoint';
+  else if (/zip|gzip|tar|bzip/i.test(mt) || d.downloadURL) m = 'bulk-download';
+  else if (d.services.length || /json|csv|xml/i.test(mt)) m = 'rest-api';
+  const type = amBase + m;
+  return { ...d, type, inferred: true, typeLabel: lit(type, NS.skos + 'prefLabel') || m,
+           accessURL: d.accessURL || (d.services[0] || {}).endpointURL || null };
 }
 
 // Where does an IRI live in the model? Used for prov:wasDerivedFrom links across catalogs.
@@ -245,7 +354,8 @@ function renderChrome() {
   const [word, ...rest] = name.split(' ');
   $('lockup').innerHTML = `${LOGO}<span>${esc(word)}${rest.length ? ` <span class="sub">${esc(rest.join(' '))}</span>` : ''}</span>`;
   $('topnav').innerHTML = `<a href="#catalogs">Catalogs</a><a href="${searchHref()}">Search</a>` +
-    (repo ? link(`https://github.com/${repo.org}/${repo.name}#readme`, 'About') : '');
+    (repo ? link(`https://github.com/${repo.org}/${repo.name}#readme`, 'About') +
+            link(`https://github.com/${repo.org}/${repo.name}/issues/new?template=add-data-source.yml`, 'Add a data source') : '');
   $('topright').innerHTML = (repo ? `<a class="btn ghost" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}" target="_blank" rel="noopener">GitHub</a>` : '') +
     `<a class="btn" href="${esc(indexModel.file)}" target="_blank" rel="noopener">Turtle</a>`;
   $('footer').innerHTML = `<div><div class="lockup">${LOGO}<span>${esc(name)}</span></div>
@@ -266,8 +376,9 @@ function crumbs(parts) {
     parts.map(p => `<span>/</span>${p.href ? `<a href="${p.href}">${esc(p.label)}</a>` : `<span>${esc(p.label)}</span>`}`).join('') + '</nav>';
 }
 
-function fileButtons(file) {
+function fileButtons(file, live) {
   if (!file) return '';
+  if (live) return `<div class="actions"><a class="btn ghost" href="${esc(file)}" target="_blank" rel="noopener">Live FAIR Data Point ↗</a></div>`;
   const out = [`<a class="btn ghost" href="${esc(file)}" target="_blank" rel="noopener">Turtle file</a>`];
   if (repo && file.startsWith(`https://raw.githubusercontent.com/${repo.org}/${repo.name}/${repo.branch}/`)) {
     const path = file.split(`/${repo.branch}/`).slice(1).join(`/${repo.branch}/`);
@@ -318,7 +429,7 @@ function showIndex() {
     html += `<a class="block" href="${hrefFor(c.key)}">
       <h3>${esc(c.title || c.key)}</h3>
       <p>${c.missing ? 'Catalog file could not be loaded.' : esc(c.description || '')}</p>
-      <div class="stats">${n} dataset${n !== 1 ? 's' : ''} · ${d} ways to get it</div>
+      <div class="stats">${c.live ? '<span class="chip live">Live FDP</span> ' : ''}${n} dataset${n !== 1 ? 's' : ''} · ${d} ways to get it</div>
       <div class="chips">${types.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
     </a>`;
   }
@@ -361,10 +472,13 @@ function showSearch(params) {
 function showCatalog(key) {
   const c = catalogs.find(x => x.key === key);
   if (!c) { $('view').innerHTML = '<div class="wrap">' + crumbs([]) + '<div class="notice">Unknown catalog.</div></div>'; return; }
-  const meta = [link(c.landingPage, 'Website ↗'), link(c.license, 'Licence ↗'), c.publisher ? 'Publisher: ' + esc(c.publisher) : ''].filter(Boolean);
+  const meta = [c.live ? '' : link(c.landingPage, 'Website ↗'), link(c.license, 'Licence ↗'), c.publisher ? 'Publisher: ' + esc(c.publisher) : '',
+                c.live ? `Read live from ${link(c.file, new URL(c.file).host + new URL(c.file).pathname.replace(/\/$/, ''))}` +
+                         (c.modified ? ` · metadata modified ${esc(c.modified)}` : '') + ` · ${c.catalogCount} catalog${c.catalogCount !== 1 ? 's' : ''}` : '']
+                .filter(Boolean).map(x => `<span>${x}</span>`);
   let html = crumbs([{ label: shortTitle(c.title) || key }]) + `<div class="page-head">
-    <div class="eyebrow">Catalog</div><h1>${esc(c.title || key)}</h1><p>${esc(c.description || '')}</p>
-    ${meta.length ? `<div class="meta">${meta.join('')}</div>` : ''}${fileButtons(c.file)}</div>`;
+    <div class="eyebrow">${c.live ? 'Live FAIR Data Point' : 'Catalog'}</div><h1>${esc(c.title || key)}</h1><p>${esc(c.description || '')}</p>
+    ${meta.length ? `<div class="meta">${meta.join('')}</div>` : ''}${fileButtons(c.file, c.live)}</div>`;
   html += `<section><div class="section-head"><h2>Datasets</h2><span class="count">${c.datasets.length}</span></div><div class="rows">`;
   for (const ds of c.datasets) {
     const n = ds.distributions.length;
@@ -372,7 +486,7 @@ function showCatalog(key) {
     html += `<a class="row" href="${hrefFor(c.key, ds.id)}">
       <div class="row-side"><span class="label">Dataset</span><span class="version">${esc(ds.version || ds.id)}</span></div>
       <div><div class="row-title">${esc(ds.title || ds.id)}</div><div class="row-desc">${esc(ds.description || '')}</div>
-        <div class="row-meta"><span>${n} way${n !== 1 ? 's' : ''} to get it</span>${dates.map(d => `<span>${esc(d)}</span>`).join('')}</div></div>
+        <div class="row-meta">${ds.group ? `<span>in ${esc(ds.group)}</span>` : ''}<span>${n} way${n !== 1 ? 's' : ''} to get it</span>${dates.map(d => `<span>${esc(d)}</span>`).join('')}</div></div>
     </a>`;
   }
   html += '</div></section>' + turtleSection(c.file);
@@ -440,6 +554,7 @@ function distRow(d, ctx) {
   return `<div class="row">
     <div class="row-side"><span class="label" style="display:flex;gap:6px;align-items:center">
       <span style="width:14px;height:14px;display:inline-flex">${icon(d.type)}</span>${esc(d.typeLabel || 'Distribution')}</span>
+      ${d.inferred ? '<span class="fmt" title="The source does not state an access method; this one was inferred from its media type and endpoint">inferred</span>' : ''}
       ${fmt ? `<span class="fmt mono">${esc(fmt)}</span>` : ''}</div>
     <div><div class="row-title">${title}</div>
       ${how ? `<div class="row-desc">${esc(how)}</div>` : ''}

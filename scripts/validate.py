@@ -32,6 +32,17 @@ for s, o in merged.subject_objects(DCAT.accessService):
     if (o, RDF.type, DCAT.DataService) not in merged:
         errors.append(f"{s}: dangling accessService {o}")
 
+# Index entries pointing into this repository must have a matching file.
+RDFS_SEEALSO = Namespace("http://www.w3.org/2000/01/rdf-schema#").seeAlso
+FDPO = Namespace("https://w3id.org/fdp/fdp-o#")
+for cat in merged.objects(None, FDPO.hasCatalog):
+    for target in merged.objects(cat, RDFS_SEEALSO):
+        t = str(target)
+        if "/fdp/" in t and t.endswith(".ttl") and "raw.githubusercontent.com" in t:
+            local = "fdp/" + t.split("/fdp/", 1)[1]
+            if not glob.glob(local):
+                errors.append(f"{cat}: rdfs:seeAlso points at {local}, which does not exist")
+
 n = lambda t: len(set(merged.subjects(RDF.type, t)))
 print(f"\n{n(DCAT.Catalog)} catalogs, {n(DCAT.Dataset)} datasets, {n(DCAT.Distribution)} distributions, {n(DCAT.DataService)} services")
 print("\n".join(errors) or "no problems found")
