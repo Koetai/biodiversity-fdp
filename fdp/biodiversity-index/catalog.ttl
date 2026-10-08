@@ -14,7 +14,9 @@
     dcterms:title "Biodiversity FDP — overarching index"@en ;
     dcterms:description "Static FAIR Data Point index over biodiversity infrastructures. Each sub-catalog describes one resource and lists every way to obtain it: native portal and APIs, bulk files, cloud buckets and copies in aggregators (GBIF, QLever, Koetai). Provenance is preserved, not deduplicated: the iNaturalist subset in GBIF appears under both."@en ;
     dcterms:publisher :publisher-curator ;
-    dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/biodiversity-index/" ;
+    # Both addresses identify this FDP: the canonical IRI and the website that serves it (with text/turtle).
+    dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/biodiversity-index/" ,
+        "https://koetai.github.io/biodiversity-fdp/" ;
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
     dcat:landingPage <https://koetai.github.io/biodiversity-fdp/> ;
     pim:persistencePolicy <https://github.com/Koetai/biodiversity-fdp/blob/main/PERSISTENCE.md> ;

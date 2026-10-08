@@ -91,7 +91,7 @@ def main():
         parts.append("</ul></section>")
     parts.append("</div>")
 
-    ld = {"@context": "https://schema.org/", "@type": "DataCatalog", "@id": str(root), "identifier": str(root),
+    ld = {"@context": "https://schema.org/", "@type": "DataCatalog", "@id": str(root), "identifier": sorted({str(root), *map(str, g.objects(root, DCTERMS.identifier)), public}),
           "name": text(g, root, DCTERMS.title), "description": text(g, root, DCTERMS.description),
           "url": public, "license": str(next(iter(g.objects(root, DCTERMS.license)), "")),
           "keywords": ["biodiversity", "FAIR Data Point", "DCAT", "data access", "SPARQL", "GBIF", "iNaturalist"],
