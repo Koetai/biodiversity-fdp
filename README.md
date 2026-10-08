@@ -7,6 +7,8 @@ Provenance is kept, not deduplicated. For example, the iNaturalist research-grad
 The layout follows [`AmsterdamUMC/proeftuin_datastandaarden/fdp`](https://github.com/AmsterdamUMC/proeftuin_datastandaarden/tree/main/fdp) and the
 [StaticFDP biodiversity deployment](https://codeberg.org/StaticFDP/staticfdp/src/branch/main/deployments/biodiversity.md).
 
+Built with the [FDP ecosystem template](https://github.com/StaticFDP/fdp-ecosystem-template). See more ecosystems, or start your own, at <https://fdp.semscape.org/ecosystems/>.
+
 ## Structure
 
 ```
