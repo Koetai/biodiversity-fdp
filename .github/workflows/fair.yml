@@ -45,7 +45,7 @@ jobs:
       github.event_name != 'workflow_run' ||
       (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180   # a full-depth run of ~2,700 calls takes 30-75 min
     env:
       START: ${{ inputs.start || 'https://koetai.github.io/biodiversity-fdp/' }}
       DEPTH: ${{ inputs.depth || 'catalog' }}
