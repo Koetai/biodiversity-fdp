@@ -192,3 +192,16 @@ footer .lockup svg { width: 22px; height: 22px; }
 .avatars .avatar { border: 2px solid var(--tint); margin-left: -6px; }
 .avatars .avatar:first-child { margin-left: 0; }
 .credits-line .avatar { margin-right: 2px; }
+
+/* FAIR assessment */
+.fair-badge { font-weight: 600; }
+.fair-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+.fair-grid { border-collapse: collapse; font-size: 13px; min-width: 100%; }
+.fair-grid th, .fair-grid td { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: center; white-space: nowrap; }
+.fair-grid thead th { font-weight: 600; font-size: 12px; color: var(--sub); vertical-align: bottom; }
+.fair-grid tbody th { text-align: left; font-weight: 500; position: sticky; left: 0; background: var(--surface); }
+.fair-grid td { font-weight: 700; cursor: help; }
+.fair-pass { color: var(--green); background: var(--tint); }
+.fair-fail { color: var(--red); }
+.fair-indeterminate, .fair-none { color: var(--faint); }
+.fair-error { color: #b54708; }

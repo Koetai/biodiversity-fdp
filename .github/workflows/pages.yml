@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write   # commit the regenerated contributors.ttl back to main
+  actions: read     # download the latest FAIR assessment report
   pages: write
   id-token: write
 
@@ -45,6 +46,21 @@ jobs:
           fi
       - run: scripts/build-site.sh
       - run: cp "$RUNNER_TEMP/contributors.json" _site/contributors.json
+      - name: Add the latest FAIR assessment of this site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          id=$(gh run list --workflow fair.yml --status success --limit 10 --json databaseId --jq '.[].databaseId' | head -n 10)
+          for run in $id; do
+            rm -rf "$RUNNER_TEMP/fair"
+            gh run download "$run" -n fair-report -D "$RUNNER_TEMP/fair" 2>/dev/null || continue
+            # Manual runs may assess another FDP; publish only reports about this site.
+            if python -c "import json,sys; sys.exit(json.load(open('$RUNNER_TEMP/fair/report.json'))['start'] != 'https://koetai.github.io/biodiversity-fdp/')"; then
+              cp "$RUNNER_TEMP/fair/report.json" _site/fair-report.json
+              echo "Published FAIR report from run $run"
+              break
+            fi
+          done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

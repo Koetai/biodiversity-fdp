@@ -105,3 +105,23 @@ The deploy regenerates the file and commits it when it changes; don't edit it by
 
 Names come from Wikidata when your GitHub account is linked there. Add **[P2037 (GitHub username)](https://www.wikidata.org/wiki/Property:P2037)** to your Wikidata item, and the next deploy also shows your Wikidata item and ORCID iD. Without it, the name comes from your GitHub profile, or else from your git author name.
 
+## FAIR assessment
+
+The *FAIR assessment* workflow ([`.github/workflows/fair.yml`](.github/workflows/fair.yml)) walks the FDP level by level, following `ldp:contains`, `fdp:metadataCatalog`/`fdp:hasCatalog`, `dcat:catalog`, `dcat:dataset`, `dcat:service` and `dcat:distribution`. It runs the [OSTrails FAIR Champion](https://tests.ostrails.eu/) tests listed in [`fair/tests.txt`](fair/tests.txt) on every resource that resolves.
+
+- **When it runs:** every Monday, after each deploy triggered by a push, or manually (*Actions → FAIR assessment → Run workflow*). You can choose another FDP to assess and a depth: `fdp`, `catalog`, `dataset` or `distribution`.
+- **Where results appear:**
+  - the run's summary page
+  - a `fair-report` artifact
+  - the website, at `#/fair`, with a badge on each catalog page
+- **Resources that are not tested:** those whose IRIs don't resolve are listed but not tested. That is itself a FAIR finding (F1/A1).
+- **Running it locally:**
+
+  ```bash
+  python3 scripts/fair_assess.py --start https://koetai.github.io/biodiversity-fdp/ \
+    --rewrite https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/=https://koetai.github.io/biodiversity-fdp/fdp/ \
+    --depth catalog --out fair-report
+  ```
+
+The test service is shared infrastructure, so keep deep runs occasional.
+

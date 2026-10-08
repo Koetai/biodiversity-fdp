@@ -45,6 +45,7 @@ let failures = [];
 let methodFilter = null;
 let amBase = null;            // namespace of the access-method vocabulary, for inferred types
 let contributors = null;      // contributors.json, generated from the GitHub repository at deploy time
+let fairReport = null;        // fair-report.json, from the FAIR assessment workflow
 
 const $ = id => document.getElementById(id);
 const esc = s => s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -141,7 +142,7 @@ async function init() {
   const vocab = vocabFiles.find(f => store.getSubjects(namedNode(NS.rdf + 'type'), namedNode(NS.skos + 'ConceptScheme'), namedNode(f)).length);
   amBase = vocab ? vocab.replace(/\.ttl$/, '#') : null;
   catalogs = refs.map(r => r.liveRoot ? buildLiveCatalog(r) : buildCatalog(r)).filter(Boolean);
-  contributors = await loadContributors();
+  [contributors, fairReport] = await Promise.all([loadContributors(), loadJson('fair-report.json')]);
   renderChrome();
   route();
 }
@@ -203,14 +204,15 @@ function buildDistribution(d) {
 
 // ── Contributors ────────────────────────────────────────────────────────────
 
-// Written by scripts/contributors.py during the Pages build; absent when browsing another FDP or locally.
-async function loadContributors() {
+// Written during the Pages build; absent when browsing another FDP or locally.
+async function loadJson(name) {
   if (!INDEX_IS_LOCAL) return null;
   try {
-    const res = await fetch('contributors.json', { cache: 'no-cache' });
+    const res = await fetch(name, { cache: 'no-cache' });
     return res.ok ? await res.json() : null;
   } catch { return null; }
 }
+const loadContributors = () => loadJson('contributors.json');
 const personByLogin = login => (contributors && contributors.people.find(p => p.login === login)) || { login, name: null, avatar: `https://github.com/${login}.png`, url: `https://github.com/${login}` };
 const displayName = p => p.name || '@' + p.login;
 const avatar = (p, size = 28) => `<img class="avatar" src="${esc(p.avatar)}${p.avatar.includes('?') ? '&' : '?'}s=${size * 2}" width="${size}" height="${size}" alt="">`;
@@ -365,6 +367,7 @@ function route() {
   const [key, ds] = path.split('/').filter(Boolean).map(decodeURIComponent);
   if (key === 'search') showSearch(new URLSearchParams(query || ''));
   else if (key === 'contributors') showContributors();
+  else if (key === 'fair') showFair();
   else if (key && ds) showDataset(key, ds);
   else if (key) showCatalog(key);
   else showIndex();
@@ -382,6 +385,7 @@ function renderChrome() {
   $('lockup').innerHTML = `${LOGO}<span>${esc(word)}${rest.length ? ` <span class="sub">${esc(rest.join(' '))}</span>` : ''}</span>`;
   $('topnav').innerHTML = `<a href="#catalogs">Catalogs</a><a href="${searchHref()}">Search</a>` +
     (contributors ? '<a href="#/contributors">Contributors</a>' : '') +
+    (fairReport ? '<a href="#/fair">FAIR tests</a>' : '') +
     (repo ? link(`https://github.com/${repo.org}/${repo.name}#readme`, 'About') +
             link(`https://github.com/${repo.org}/${repo.name}/issues/new?template=add-data-source.yml`, 'Add a data source') : '');
   $('topright').innerHTML = (repo ? `<a class="btn ghost" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}" target="_blank" rel="noopener">GitHub</a>` : '') +
@@ -525,7 +529,7 @@ function showCatalog(key) {
                 .filter(Boolean).map(x => `<span>${x}</span>`);
   let html = crumbs([{ label: shortTitle(c.title) || key }]) + `<div class="page-head">
     <div class="eyebrow">${c.live ? 'Live FAIR Data Point' : 'Catalog'}</div><h1>${esc(c.title || key)}</h1><p>${esc(c.description || '')}</p>
-    ${meta.length ? `<div class="meta">${meta.join('')}</div>` : ''}${catalogCredits(c)}${fileButtons(c.file, c.live)}</div>`;
+    ${meta.length ? `<div class="meta">${meta.join('')}</div>` : ''}${catalogCredits(c)}${fairBadge(c.key)}${fileButtons(c.file, c.live)}</div>`;
   html += `<section><div class="section-head"><h2>Datasets</h2><span class="count">${c.datasets.length}</span></div><div class="rows">`;
   for (const ds of c.datasets) {
     const n = ds.distributions.length;
@@ -549,6 +553,56 @@ function catalogCredits(c) {
   return `<div class="meta credits-line"><span>${avatar(added, 20)} Added by <a href="${esc(added.url)}" target="_blank" rel="noopener">${esc(displayName(added))}</a> on ${esc(info.added)}</span>` +
     (others.length ? `<span>Improved by ${others.map(p => `${avatar(p, 20)} <a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(displayName(p))}</a>`).join(', ')}</span>` : '') +
     '</div>';
+}
+
+// ── FAIR assessment ─────────────────────────────────────────────────────────
+
+const FAIR_SYMBOL = { pass: '✓', fail: '✗', indeterminate: '–', error: '!' };
+// Report nodes tested by their catalog document map to the viewer's catalog keys.
+const fairKey = n => ((n.guid || '').match(/\/fdp\/([^/]+)\/catalog\.ttl$/) || [])[1] || (n.depth === 0 && !n.parent ? 'index' : null);
+
+function fairLabel(n, i) {
+  const key = fairKey(n);
+  if (key === 'index') return 'Index';
+  const c = key && catalogs.find(x => x.key === key);
+  return c ? shortTitle(c.title) : (n.title || `${n.level || 'node'} ${i + 1}`).slice(0, 18);
+}
+
+function fairBadge(key) {
+  const n = fairReport && fairReport.nodes.find(x => fairKey(x) === key && x.score && x.score.total);
+  if (!n) return '';
+  return `<div class="meta"><a class="fair-badge" href="#/fair">FAIR tests: ${n.score.pass} of ${n.score.total} pass</a>
+    <span>assessed ${esc(fairReport.generated.slice(0, 10))}</span></div>`;
+}
+
+function showFair() {
+  const r = fairReport;
+  if (!r) { $('view').innerHTML = '<div class="wrap">' + crumbs([]) + '<div class="notice">No FAIR assessment has been published yet.</div></div>'; return; }
+  const tested = r.nodes.filter(n => n.score && n.score.total);
+  const skipped = r.nodes.filter(n => !(n.score && n.score.total));
+  const byLevel = {};
+  skipped.forEach(n => { byLevel[n.level || 'other'] = (byLevel[n.level || 'other'] || 0) + 1; });
+  const totals = tested.reduce((t, n) => { ['pass', 'fail', 'indeterminate', 'error'].forEach(k => t[k] += n.score[k]); return t; }, { pass: 0, fail: 0, indeterminate: 0, error: 0 });
+  const short = id => id.replace(/^test_FM_/, '').replace(/_M_/, ' ');
+  let html = crumbs([{ label: 'FAIR tests' }]) + `<div class="page-head"><div class="eyebrow">FAIR assessment</div>
+    <h1>How FAIR is this FDP?</h1>
+    <p>Every level of the FAIR Data Point was walked (FDP → catalogs → datasets → distributions) and each resource that resolves was
+      assessed with ${r.tests.length} <a href="https://tests.ostrails.eu/" target="_blank" rel="noopener">OSTrails FAIR Champion</a> tests.
+      Assessed ${esc(r.generated.slice(0, 10))}, depth: ${esc(r.depth)}.</p>
+    <div class="meta"><span>${tested.length} resources tested</span><span>✓ ${totals.pass} pass</span><span>✗ ${totals.fail} fail</span>
+      <span>– ${totals.indeterminate} indeterminate</span>${totals.error ? `<span>! ${totals.error} test errors</span>` : ''}</div>
+    ${skipped.length ? `<p style="margin-top:10px">Not tested because their IRIs do not resolve: ${Object.entries(byLevel).map(([k, v]) => `${v} ${esc(k)}${v !== 1 ? 's' : ''}`).join(', ')}.
+      Dereferenceable IRIs for every level (e.g. via w3id.org) would let them be assessed too.</p>` : ''}
+    ${repo ? `<div class="actions"><a class="btn ghost" href="https://github.com/${esc(repo.org)}/${esc(repo.name)}/actions/workflows/fair.yml" target="_blank" rel="noopener">Assessment runs</a></div>` : ''}
+  </div>
+  <section><div class="section-head"><h2>Per test</h2><span class="count">✓ pass · ✗ fail · – indeterminate</span></div>
+  <div class="fair-scroll"><table class="fair-grid"><thead><tr><th>Test</th>${tested.map((n, i) =>
+      `<th title="${esc(n.title || n.iri)}"><a href="${fairKey(n) && fairKey(n) !== 'index' ? hrefFor(fairKey(n)) : '#'}">${esc(fairLabel(n, i))}</a></th>`).join('')}</tr></thead><tbody>` +
+    r.tests.map(t => `<tr><th><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(short(t.id))}</a></th>` + tested.map(n => {
+      const res = n.results[t.id] || {};
+      return `<td class="fair-${esc(res.value || 'none')}" title="${esc(res.summary || res.value || '')}">${FAIR_SYMBOL[res.value] || ''}</td>`;
+    }).join('') + '</tr>').join('') + `</tbody></table></div></section>`;
+  $('view').innerHTML = '<div class="wrap">' + html + '</div>';
 }
 
 // ── Contributors page ───────────────────────────────────────────────────────

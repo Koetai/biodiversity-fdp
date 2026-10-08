@@ -1,0 +1,40 @@
+# # /biodiversity-fdp/
+#
+# Persistent IRIs for the Biodiversity FDP, a static FAIR Data Point describing
+# every way to obtain biodiversity data (GBIF, iNaturalist, BHL, Plazi, UniProt,
+# OpenStreetMap, GeoNames, FLAIR-GG germplasm banks, ...).
+#
+# Source: https://github.com/Koetai/biodiversity-fdp
+# Content is served by GitHub Pages at https://koetai.github.io/biodiversity-fdp/
+# (text/turtle with Access-Control-Allow-Origin: *).
+#
+# https://w3id.org/biodiversity-fdp/                  -> FDP index
+# https://w3id.org/biodiversity-fdp/<catalog>-fdp/... -> that catalog
+# https://w3id.org/biodiversity-fdp/vocab/...         -> access-method vocabulary
+# RDF clients (Accept: text/turtle) get Turtle; everything else gets the website.
+#
+# ## Contact
+# This space is administered by:
+#
+# Andra Waagmeester
+# GitHub username: andrawaag
+# ORCID: https://orcid.org/0000-0001-9773-4008
+
+RewriteEngine on
+
+# Explicit Turtle files, e.g. biodiversity-index/contributors.ttl or gbif-fdp/catalog.ttl
+RewriteRule ^(.+\.ttl)$ https://koetai.github.io/biodiversity-fdp/fdp/$1 [R=302,L]
+
+# The access-method vocabulary (concept IRIs are vocab/access-methods#<method>); one Turtle file
+# for every client, browsers display it as text.
+RewriteRule ^vocab/access-methods$ https://koetai.github.io/biodiversity-fdp/fdp/vocab/access-methods.ttl [R=303,L]
+
+# The index: the FDP root and anything under biodiversity-index/
+RewriteCond %{HTTP_ACCEPT} text/turtle
+RewriteRule ^(biodiversity-index/.*)?$ https://koetai.github.io/biodiversity-fdp/fdp/biodiversity-index/catalog.ttl [R=303,L]
+RewriteRule ^(biodiversity-index/.*)?$ https://koetai.github.io/biodiversity-fdp/ [R=303,L]
+
+# A catalog and everything described in it (catalog, datasets, distributions, services)
+RewriteCond %{HTTP_ACCEPT} text/turtle
+RewriteRule ^([a-z0-9-]+-fdp)(/.*)?$ https://koetai.github.io/biodiversity-fdp/fdp/$1/catalog.ttl [R=303,L]
+RewriteRule ^([a-z0-9-]+-fdp)(/.*)?$ https://koetai.github.io/biodiversity-fdp/#/$1 [R=303,L,NE]

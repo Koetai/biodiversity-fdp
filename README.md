@@ -50,6 +50,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). In short:
 2. **Live FAIR Data Point**: point an index entry at a source's own FDP. The viewer crawls it in the browser, so it is always current.
 3. **By hand, or with `scripts/add_source.py`** and a JSON spec.
 
+## FAIR assessment
+
+A workflow walks every level of the FDP and runs the OSTrails FAIR Champion tests on each resource that resolves. It runs weekly, after deploys and on demand. Results are published at [`#/fair`](https://koetai.github.io/biodiversity-fdp/#/fair). See [CONTRIBUTING.md](CONTRIBUTING.md#fair-assessment).
+
 ## Housekeeping
 
 ```bash
