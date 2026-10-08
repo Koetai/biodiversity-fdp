@@ -18,8 +18,8 @@ on:
   workflow_dispatch:
     inputs:
       start:
-        description: FDP to assess (its root, or a web page that links it with rel=describedby)
-        default: https://koetai.github.io/biodiversity-fdp/
+        description: FDP to assess (its root, or a web page that links it with rel=describedby). Empty = this FDP.
+        default: ""
       depth:
         description: How deep to walk
         type: choice
@@ -34,9 +34,6 @@ concurrency:
   group: fair-assessment
   cancel-in-progress: true
 
-env:
-  SITE: https://koetai.github.io/biodiversity-fdp/
-
 jobs:
   assess:
     # After a deploy, only when it was a content push; the deploy this workflow
@@ -47,8 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180   # a full-depth run of ~2,700 calls takes 30-75 min
     env:
-      START: ${{ inputs.start || 'https://koetai.github.io/biodiversity-fdp/' }}
-      DEPTH: ${{ inputs.depth || 'catalog' }}
+      START_INPUT: ${{ inputs.start }}
+      DEPTH_INPUT: ${{ inputs.depth }}
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
@@ -59,10 +56,18 @@ jobs:
 
       - run: pip install rdflib
 
+      - name: Read this FDP's settings
+        run: |
+          site=$(python scripts/fdpconfig.py get siteUrl)
+          echo "SITE=$site" >> "$GITHUB_ENV"
+          echo "START=${START_INPUT:-$site}" >> "$GITHUB_ENV"
+          echo "DEPTH=${DEPTH_INPUT:-$(python scripts/fdpconfig.py get fair.depth || echo catalog)}" >> "$GITHUB_ENV"
+
       - name: Walk the FDP and run the FAIR tests
         run: |
+          # Our own canonical IRIs are fetched from the website copy, which serves text/turtle.
           python scripts/fair_assess.py --start "$START" --depth "$DEPTH" --workers 3 --out fair-report \
-            --rewrite "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/=${SITE}fdp/"
+            --rewrite "$(python scripts/fdpconfig.py get baseIri)=${SITE}fdp/"
           cat fair-report/summary.md >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@v4

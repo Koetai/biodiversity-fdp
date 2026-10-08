@@ -1,14 +1,15 @@
-# Biodiversity FDP — notes for Claude
+# FDP ecosystem — notes for Claude
 
-Static FAIR Data Point in Turtle (`fdp/`) with a client-side viewer (`site/`) deployed to GitHub Pages.
+A static FAIR Data Point in Turtle (`fdp/`) with a client-side viewer (`site/`), deployed to GitHub Pages and built from the [FDP ecosystem template](https://github.com/StaticFDP/fdp-ecosystem-template).
 
-- To add or change a data source, follow [CONTRIBUTING.md](CONTRIBUTING.md). Its conventions are the contract: three DCAT levels, an access-method `dcterms:type` and a "How to get it:" description on every distribution.
-- Prefer `scripts/add_source.py` with a JSON spec (see `scripts/example-source.json`) for new curated sources. For a source that runs its own FAIR Data Point, add a live index entry instead of copying its metadata.
-- Before writing a distribution, check that the URL resolves and that endpoints answer a real query. State counts and dates with "on YYYY-MM-DD".
-- After any change, run `python3 scripts/validate.py` and preview it:
+- **Instance vs engine.** Everything instance-specific (name, IRIs, theme, logo, maintainer) is in `fdp.config.json`, `fdp/` and `assets/`. Engine files are listed in `.fdp-engine`. Never hardcode instance values in engine files; read them via `scripts/fdpconfig.py`.
+- **Adding a data source.** Follow [CONTRIBUTING.md](CONTRIBUTING.md): three DCAT levels, and on every distribution an access-method `dcterms:type` plus a "How to get it:" description. Prefer `scripts/add_source.py` with a JSON spec (`scripts/example-source.json`). For a source with its own FDP, add a live index entry.
+- **Verify before writing.** Check that URLs resolve and endpoints answer a real query; state counts and dates "on YYYY-MM-DD".
+- **After any change**, validate and preview:
 
   ```bash
+  python3 scripts/validate.py
   scripts/build-site.sh && python3 -m http.server -d _site 8000
   ```
 
-- Do not hand-edit IRIs to rename the repo; use `scripts/set-base.sh`.
+- **Moving IRIs.** Use `scripts/set-base.sh` (to another repository or a w3id); it also updates the config.

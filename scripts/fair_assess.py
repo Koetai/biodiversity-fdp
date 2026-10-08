@@ -12,9 +12,9 @@ service). A node is tested when it can be dereferenced: its own IRI resolves, or
 is the main subject of a document we fetched (then the document URL is the GUID).
 Nodes that do not resolve are reported as such and not sent to the test service.
 
-    python3 scripts/fair_assess.py --start https://koetai.github.io/biodiversity-fdp/ \\
-        --rewrite https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/=https://koetai.github.io/biodiversity-fdp/fdp/ \\
-        --depth catalog --out fair-report
+    python3 scripts/fair_assess.py --start <siteUrl> --rewrite <baseIri>=<siteUrl>fdp/ --depth catalog --out fair-report
+
+(Without --start/--rewrite the values from fdp.config.json are used.)
 
 Outputs report.json and summary.md in --out. The test service is shared
 infrastructure: keep --workers low and do not run deep assessments often.
@@ -32,7 +32,8 @@ from pathlib import Path
 from rdflib import Graph, Namespace, URIRef
 from rdflib.namespace import DCAT, DCTERMS, RDF, RDFS
 
-ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fdpconfig import BASE_IRI, ROOT, SITE_URL  # noqa: E402
 FDPO = Namespace("https://w3id.org/fdp/fdp-o#")
 LDP = Namespace("http://www.w3.org/ns/ldp#")
 TEST_API = "https://tests.ostrails.eu/tests/assess/test/"
@@ -236,7 +237,7 @@ def markdown(report):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--start", required=True, help="FDP root, or a web page linking it with rel=describedby")
+    ap.add_argument("--start", default=SITE_URL, help="FDP root, or a web page linking it with rel=describedby (default: siteUrl)")
     ap.add_argument("--rewrite", action="append", default=[], help="FROM=TO prefix rewrite used to fetch and test IRIs")
     ap.add_argument("--depth", choices=list(DEPTH), default="catalog")
     ap.add_argument("--tests", default=str(ROOT / "fair" / "tests.txt"))
@@ -245,7 +246,7 @@ def main():
     ap.add_argument("--out", default="fair-report")
     args = ap.parse_args()
 
-    rewrite = [tuple(r.split("=", 1)) for r in args.rewrite]
+    rewrite = [tuple(r.split("=", 1)) for r in args.rewrite] or [(BASE_IRI, SITE_URL.rstrip("/") + "/fdp/")]
     tests = [l.strip() for l in Path(args.tests).read_text().splitlines() if l.strip() and not l.startswith("#")]
     walker = Walker(rewrite, DEPTH[args.depth], args.max_nodes)
     nodes = list(walker.walk(args.start).values())

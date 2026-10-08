@@ -1,5 +1,8 @@
 """Parse every Turtle file under fdp/ and check the FDP/DCAT shape we rely on."""
 import glob, sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fdpconfig import BASE_IRI  # noqa: E402
 from rdflib import Graph, Namespace, RDF
 
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -38,8 +41,8 @@ FDPO = Namespace("https://w3id.org/fdp/fdp-o#")
 for cat in merged.objects(None, FDPO.hasCatalog):
     for target in merged.objects(cat, RDFS_SEEALSO):
         t = str(target)
-        if "/fdp/" in t and t.endswith(".ttl") and "raw.githubusercontent.com" in t:
-            local = "fdp/" + t.split("/fdp/", 1)[1]
+        if t.startswith(BASE_IRI) and t.endswith(".ttl"):
+            local = "fdp/" + t[len(BASE_IRI):]
             if not glob.glob(local):
                 errors.append(f"{cat}: rdfs:seeAlso points at {local}, which does not exist")
 

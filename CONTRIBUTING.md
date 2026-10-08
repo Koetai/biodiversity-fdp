@@ -1,6 +1,10 @@
-# Adding a data source
+# Contributing to an FDP ecosystem
 
-There are three ways to add a resource to the Biodiversity FDP. All of them end in a pull request: CI validates the Turtle, and after the merge GitHub Pages redeploys the site at <https://koetai.github.io/biodiversity-fdp/>.
+This repository is an FDP ecosystem built from the [FDP ecosystem template](https://github.com/StaticFDP/fdp-ecosystem-template). Everything instance-specific is in [`fdp.config.json`](fdp.config.json), [`fdp/`](fdp) and `assets/`; the engine (scripts, viewer, workflows) is listed in [`.fdp-engine`](.fdp-engine) and is updated from the template.
+
+## Adding a data source
+
+There are three ways to add a resource to this FDP. All of them end in a pull request: CI validates the Turtle, and after the merge GitHub Pages redeploys the site (`siteUrl` in [`fdp.config.json`](fdp.config.json)).
 
 | Route | Use it when | You write |
 |---|---|---|
@@ -8,9 +12,9 @@ There are three ways to add a resource to the Biodiversity FDP. All of them end 
 | [2. Link a live FAIR Data Point](#2-link-a-live-fair-data-point) | The source already runs its own FDP | One URL |
 | [3. By hand or with the script](#3-by-hand-or-with-the-script) | You want full control, several datasets, or extra metadata | Turtle, or a JSON spec |
 
-## 1. The issue form (no Turtle needed)
+### 1. The issue form (no Turtle needed)
 
-1. Open [**New issue → Add a data source**](https://github.com/Koetai/biodiversity-fdp/issues/new?template=add-data-source.yml).
+1. Open [**New issue → Add a data source**](../../issues/new?template=add-data-source.yml).
 2. Choose **Curated**, fill in the name, publisher and licence, and list the ways to get the data, one per line:
 
    ```text
@@ -22,16 +26,16 @@ There are three ways to add a resource to the Biodiversity FDP. All of them end 
 4. Wrong or missing values? Edit the issue. The workflow regenerates the branch. If it can't parse the form, it comments with the reason.
 5. A maintainer reviews and merges.
 
-## 2. Link a live FAIR Data Point
+### 2. Link a live FAIR Data Point
 
-If the source publishes its own FDP (for example the FLAIR-GG germplasm banks, or a Koetai node), don't copy its metadata: link it. The viewer crawls the FDP in the visitor's browser: FDP → catalogs → datasets and data services → distributions → access services. It is therefore always current.
+If the source publishes its own FDP (for example a germplasm bank running FAIR-in-a-box, or a Koetai node), don't copy its metadata: link it. The viewer crawls the FDP in the visitor's browser: FDP → catalogs → datasets and data services → distributions → access services. It is therefore always current.
 
 Requirements for the remote FDP:
 
 - `curl -H 'Accept: text/turtle' <url>` returns Turtle that lists `fdp:metadataCatalog` (or `dcat:catalog`).
-- The server sends `Access-Control-Allow-Origin` (`*`, or `https://koetai.github.io`), so browsers may read it.
+- The server sends `Access-Control-Allow-Origin` (`*`, or this site's origin), so browsers may read it.
 
-Use the issue form with **Live**, or add an entry to `fdp/biodiversity-index/catalog.ttl`:
+Use the issue form with **Live**, or add an entry to the index, `fdp/<indexFolder>/catalog.ttl` (`indexFolder` is set in `fdp.config.json`):
 
 ```turtle
 :catalog-bgv-live
@@ -44,9 +48,9 @@ Also add `:catalog-bgv-live` to the `fdp:hasCatalog` list at the top of that fil
 
 Remote FDPs rarely type their distributions with our access-method vocabulary. The viewer infers one from the media type, the endpoint URL and the presence of an access service, and labels it *inferred*. If you want "How to get it" notes and exact types, describe the source as a curated catalog (route 1 or 3) instead. You can also do both, as was done for FLAIR-GG.
 
-## 3. By hand or with the script
+### 3. By hand or with the script
 
-### With the script (JSON spec)
+#### With the script (JSON spec)
 
 ```bash
 cp scripts/example-source.json my-source.json      # edit it
@@ -64,10 +68,10 @@ The spec fields are:
 
 The script refuses invalid slugs, URLs or media types, unknown access methods, and existing folders.
 
-### By hand
+#### By hand
 
 1. Copy a small catalog, e.g. `fdp/geonames-fdp/catalog.ttl`, to `fdp/<slug>-fdp/catalog.ttl`. Change the `@prefix :` line and the root IRI to the new folder.
-2. Add a `:catalog-<slug>` entry to `fdp/biodiversity-index/catalog.ttl` (title, licence, `rdfs:seeAlso` to the new file), and add it to `fdp:hasCatalog`.
+2. Add a `:catalog-<slug>` entry to the index, `fdp/<indexFolder>/catalog.ttl`, (title, licence, `rdfs:seeAlso` to the new file), and add it to `fdp:hasCatalog`.
 3. Run `python3 scripts/validate.py`, then preview:
 
    ```bash
@@ -86,7 +90,7 @@ The script refuses invalid slugs, URLs or media types, unknown access methods, a
 - **Media types** are IANA IRIs (`https://www.iana.org/assignments/media-types/…`). Formats come from the EU file-type authority.
 - **Copies in aggregators** (GBIF, QLever, Koetai…) are distributions of the original dataset, typed `aggregator-mirror` or by their access method, with `prov:wasDerivedFrom` pointing at what they were derived from. Provenance is kept, not deduplicated.
 - **Verify before you write.** Check that URLs resolve and that endpoints answer a real query. Record counts and dates as "on YYYY-MM-DD". If something is broken, say so in the description rather than leaving it out.
-- All IRIs use the base `https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/`. If the repository moves, run `scripts/set-base.sh <org> <repo> [branch]`.
+- All IRIs start with `baseIri` from `fdp.config.json`. To move them (another repository, or a w3id), run `scripts/set-base.sh <org> <repo> [branch]` or `scripts/set-base.sh <base IRI>`; it also updates the config.
 
 ## Credit
 
@@ -96,7 +100,7 @@ The site's Contributors section is rebuilt on every deploy by `scripts/contribut
 - merged pull requests
 - "Add a data source" issues: whoever fills in the form is credited for the catalog, even though the bot makes the commit
 
-Each catalog page shows who added it and who improved it. The same information is part of the FDP metadata in [`fdp/biodiversity-index/contributors.ttl`](fdp/biodiversity-index/contributors.ttl), which the index links with `rdfs:seeAlso`:
+Each catalog page shows who added it and who improved it. The same information is part of the FDP metadata in `fdp/<indexFolder>/contributors.ttl`, which the index links with `rdfs:seeAlso`:
 
 - `dcterms:creator` and `dcterms:contributor` on the index and on each catalog
 - `foaf:Person` nodes with the person's GitHub account, and `owl:sameAs` links to their Wikidata item and ORCID
@@ -118,9 +122,7 @@ The *FAIR assessment* workflow ([`.github/workflows/fair.yml`](.github/workflows
 - **Running it locally:**
 
   ```bash
-  python3 scripts/fair_assess.py --start https://koetai.github.io/biodiversity-fdp/ \
-    --rewrite https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/=https://koetai.github.io/biodiversity-fdp/fdp/ \
-    --depth catalog --out fair-report
+  python3 scripts/fair_assess.py --depth catalog --out fair-report    # start and IRI mapping come from fdp.config.json
   ```
 
 The test service is shared infrastructure, so keep deep runs occasional.

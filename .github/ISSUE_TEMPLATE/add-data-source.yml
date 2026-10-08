@@ -1,5 +1,5 @@
 name: Add a data source
-description: Describe a biodiversity resource (or link its FAIR Data Point). A bot turns this into a pull request.
+description: Describe a data resource (or link its FAIR Data Point). A bot turns this into a pull request.
 title: "Add data source: "
 labels: ["data-source"]
 body:

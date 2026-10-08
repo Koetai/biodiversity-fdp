@@ -9,9 +9,10 @@ sees an empty page. This step, run after scripts/build-site.sh, writes into _sit
 * schema.org JSON-LD (DataCatalog → Dataset → DataDownload) in <head>;
 * FAIR signposting links (describedby, cite-as, license) in <head>;
 * sitemap.xml (submit it in Google Search Console; a robots.txt under a project
-  path like /biodiversity-fdp/ would be ignored by crawlers, so none is written).
+  path like /<repo>/ would be ignored by crawlers, so none is written);
+* the instance's title, description, fonts, colours and logo from fdp.config.json.
 
-    python3 scripts/build_static.py _site https://koetai.github.io/biodiversity-fdp/
+    python3 scripts/build_static.py _site [public URL; default: siteUrl from fdp.config.json]
 """
 import html
 import json
@@ -22,7 +23,8 @@ from pathlib import Path
 from rdflib import Graph, Namespace, URIRef
 from rdflib.namespace import DCAT, DCTERMS, FOAF, RDF, RDFS
 
-ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fdpconfig import CONFIG, INDEX_FOLDER, ROOT, SITE_URL  # noqa: E402
 FDP = Namespace("https://w3id.org/fdp/fdp-o#")
 SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
 IANA = "https://www.iana.org/assignments/media-types/"
@@ -35,8 +37,47 @@ def text(g, s, p):
     return str((en or vals or [""])[0])
 
 
+THEME_VARS = {"bg": "--bg", "surface": "--surface", "tint": "--tint", "tint2": "--tint-2", "primary": "--primary",
+              "primaryHover": "--primary-hover", "onPrimary": "--on-primary", "text": "--text", "sub": "--sub",
+              "faint": "--faint", "border": "--border", "codeBg": "--code-bg"}
+
+
+def css_vars(palette):
+    return "; ".join(f"{THEME_VARS[k]}: {v}" for k, v in (palette or {}).items() if k in THEME_VARS and re.match(r"^#[0-9a-fA-F]{3,8}$", v))
+
+
+def instance_head(e, public):
+    """Title, description, favicon, fonts, theme, logo and runtime config of this instance."""
+    theme = CONFIG.get("theme", {})
+    heading, body = theme.get("headingFont", "Source Serif 4"), theme.get("bodyFont", "Source Sans 3")
+    fam = lambda f: re.sub(r"[^A-Za-z0-9 ]", "", f).replace(" ", "+")
+    fonts = theme.get("fontsUrl") or (f"https://fonts.googleapis.com/css2?family={fam(heading)}:ital,wght@0,400;0,700;1,400"
+                                      f"&family={fam(body)}:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap")
+    light, dark = css_vars(theme.get("light")), css_vars(theme.get("dark"))
+    dark_block = f"{dark}; color-scheme: dark" if dark else ""
+    style = (f":root {{ --serif: '{heading}', Georgia, serif; --sans: '{body}', system-ui, sans-serif; {light} }}"
+             + (f" @media (prefers-color-scheme: dark) {{ :root:not([data-theme=\"light\"]) {{ {dark_block} }} }}"
+                f" :root[data-theme=\"dark\"] {{ {dark_block} }}" if dark else ""))
+    logo_path = ROOT / theme.get("logo", "assets/logo.svg")
+    logo_svg = ""
+    if logo_path.exists():
+        logo_svg = re.sub(r"<!--.*?-->|<\?xml[^>]*\?>", "", logo_path.read_text(), flags=re.S).strip()
+        logo_svg = re.sub(r'(<svg\b[^>]*?)\s+color="[^"]*"', r"\1", logo_svg, count=1)   # inline copy follows the theme colour
+    runtime = {k: CONFIG.get(k) for k in ("name", "headline", "indexFolder", "repository", "branch", "siteUrl")}
+    runtime_json = json.dumps(runtime, ensure_ascii=False).replace("</", "<\\/")
+    return (f"<title>{e(CONFIG['name'])}</title>\n"
+            f'<meta name="description" content="{e(CONFIG.get("description", ""))}">\n'
+            + (f'<link rel="icon" type="image/svg+xml" href="{e(theme.get("logo", "assets/logo.svg"))}">\n' if logo_svg else "")
+            + f'<link rel="alternate" type="text/turtle" href="fdp/{e(INDEX_FOLDER)}/catalog.ttl">\n'
+            f'<link rel="stylesheet" href="{e(fonts)}">\n'
+            f'<style id="fdp-theme">{style}</style>\n'
+            f"<script>window.FDP_CONFIG = {runtime_json};</script>\n"
+            + (f'<template id="fdp-logo">{logo_svg}</template>\n' if logo_svg else ""))
+
+
 def main():
-    site, public = Path(sys.argv[1]), sys.argv[2].rstrip("/") + "/"
+    site = Path(sys.argv[1])
+    public = (sys.argv[2] if len(sys.argv) > 2 else SITE_URL).rstrip("/") + "/"
     g = Graph()
     for f in sorted((ROOT / "fdp").glob("**/*.ttl")):
         g.parse(f, format="turtle")
@@ -44,7 +85,7 @@ def main():
     # The index: the metadata service whose catalogs point (rdfs:seeAlso) at other documents.
     root = max(set(g.subjects(FDP.hasCatalog, None)),
                key=lambda r: sum(1 for c in g.objects(r, FDP.hasCatalog) if (c, RDFS.seeAlso, None) in g))
-    index_file = public + "fdp/biodiversity-index/catalog.ttl"
+    index_file = public + f"fdp/{INDEX_FOLDER}/catalog.ttl"
     label = lambda t: text(g, t, SKOS.prefLabel) or str(t).rsplit("#", 1)[-1]
 
     # Curated catalogs in index order: the dcat:Catalog that lists datasets in each linked file.
@@ -56,7 +97,7 @@ def main():
         cat = URIRef(str(f).rsplit("/", 1)[0] + "/catalog")
         if (cat, RDF.type, DCAT.Catalog) in g:
             entries.append((str(f).split("/fdp/", 1)[1].split("/")[0], cat))
-    order = [m for m in re.findall(r":catalog-([\w-]+)", (ROOT / "fdp/biodiversity-index/catalog.ttl").read_text())]
+    order = [m for m in re.findall(r":catalog-([\w-]+)", (ROOT / "fdp" / INDEX_FOLDER / "catalog.ttl").read_text())]
     entries.sort(key=lambda e: next((i for i, o in enumerate(order) if e[0].startswith(o)), 99))
 
     # ── static HTML ──
@@ -94,19 +135,19 @@ def main():
     ld = {"@context": "https://schema.org/", "@type": "DataCatalog", "@id": str(root), "identifier": sorted({str(root), *map(str, g.objects(root, DCTERMS.identifier)), public}),
           "name": text(g, root, DCTERMS.title), "description": text(g, root, DCTERMS.description),
           "url": public, "license": str(next(iter(g.objects(root, DCTERMS.license)), "")),
-          "keywords": ["biodiversity", "FAIR Data Point", "DCAT", "data access", "SPARQL", "GBIF", "iNaturalist"],
+          "keywords": CONFIG.get("keywords", ["FAIR Data Point", "DCAT"]),
           "creator": [{"@type": "Person", "name": text(g, p, FOAF.name),
                        "sameAs": [str(x) for x in g.objects(p, URIRef("http://www.w3.org/2002/07/owl#sameAs"))]}
                       for p in g.objects(root, DCTERMS.contributor)],
           "dataset": ld_datasets}
 
     ld_json = json.dumps(ld, ensure_ascii=False).replace("</", "<\\/")   # never close the script element early
-    head = (f'<script type="application/ld+json">{ld_json}</script>\n'
+    head = instance_head(e, public) + (f'<script type="application/ld+json">{ld_json}</script>\n'
             f'<link rel="describedby" type="text/turtle" href="{e(index_file)}">\n'
             f'<link rel="cite-as" href="{e(str(root))}">\n'
             f'<link rel="license" href="{e(ld["license"])}">\n')
     page = (site / "index.html").read_text()
-    page = page.replace("</head>", head + "</head>", 1)
+    page = re.sub(r"<title>.*?</title>\s*<!-- fdp:head[^>]*-->", lambda m: head, page, count=1, flags=re.S)
     page = re.sub(r'(<main id="view">).*?(</main>)', lambda m: m.group(1) + "".join(parts) + m.group(2), page, count=1, flags=re.S)
     (site / "index.html").write_text(page)
 

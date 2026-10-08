@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add a data source to the Biodiversity FDP.
+"""Add a data source to this FDP ecosystem (see fdp.config.json).
 
 Two kinds of source:
 
@@ -26,8 +26,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-INDEX = ROOT / "fdp" / "biodiversity-index" / "catalog.ttl"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fdpconfig import BASE_IRI, INDEX_FILE as INDEX, INDEX_FOLDER, NAME, ROOT  # noqa: E402
+
 VOCAB = ROOT / "fdp" / "vocab" / "access-methods.ttl"
 IANA = "https://www.iana.org/assignments/media-types/"
 
@@ -66,10 +67,7 @@ def access_methods():
 
 
 def base_iri():
-    m = re.search(r"^@prefix :\s+<(.+/fdp/)biodiversity-index/>", INDEX.read_text(), re.M)
-    if not m:
-        raise SystemExit("Could not find the base IRI in the index catalog")
-    return m.group(1)
+    return BASE_IRI
 
 
 def local_id(text, used):
@@ -158,7 +156,7 @@ def catalog_ttl(s, base, today):
 
 <{base}{folder}/>
     a fdp:MetadataService, r3d:Repository ;
-    dcterms:title {lit(s['title'] + ' FAIR Data Point — Biodiversity FDP')} ;
+    dcterms:title {lit(s['title'] + ' FAIR Data Point — ' + NAME)} ;
     dcterms:publisher :publisher-source ;
     dcterms:modified "{today}"^^xsd:date ;
     fdp:hasCatalog :catalog .
@@ -346,7 +344,7 @@ def main():
         s = validate(raw)
         today = datetime.date.today().isoformat()
         base = base_iri()
-        lines = [f"Adds **{s['title']}** (`{s['slug']}`) to the Biodiversity FDP as a **{s['mode']}** source.", ""]
+        lines = [f"Adds **{s['title']}** (`{s['slug']}`) to the {NAME} as a **{s['mode']}** source.", ""]
         if s["mode"] == "curated":
             folder = ROOT / "fdp" / f"{s['slug']}-fdp"
             if folder.exists():
@@ -362,7 +360,7 @@ def main():
             lines += [f"- Links the live FAIR Data Point <{s['fdpUrl']}>; the viewer crawls it in the browser."]
             lines += ["- Check: " + n for n in check_live_fdp(s["fdpUrl"])]
         register_in_index(s, base, today)
-        lines += ["- Registered in `fdp/biodiversity-index/catalog.ttl`", "",
+        lines += [f"- Registered in `fdp/{INDEX_FOLDER}/catalog.ttl`", "",
                   "Review the Turtle and the preview after merging; GitHub Pages redeploys automatically."]
         if args.summary:
             Path(args.summary).write_text("\n".join(lines) + "\n")

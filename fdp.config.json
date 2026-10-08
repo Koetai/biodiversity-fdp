@@ -1,0 +1,22 @@
+{
+  "$comment": "The one file that makes this FDP ecosystem yours. Engine code (scripts/, site/, workflows) reads everything instance-specific from here.",
+  "name": "Biodiversity FDP",
+  "repository": "Koetai/biodiversity-fdp",
+  "branch": "main",
+  "siteUrl": "https://koetai.github.io/biodiversity-fdp/",
+  "baseIri": "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/",
+  "indexFolder": "biodiversity-index",
+  "headline": "Every way to get *biodiversity* data",
+  "description": "Every way to get biodiversity data: a FAIR Data Point over iNaturalist, GBIF, BHL, Plazi, UniProt, OpenStreetMap, GeoNames and the FLAIR-GG germplasm banks.",
+  "keywords": ["biodiversity", "FAIR Data Point", "DCAT", "data access", "SPARQL", "GBIF", "iNaturalist"],
+  "maintainer": { "name": "Andra Waagmeester", "github": "andrawaag", "orcid": "0000-0001-9773-4008" },
+  "theme": {
+    "logo": "assets/logo.svg",
+    "headingFont": "Libre Baskerville",
+    "bodyFont": "Source Sans 3",
+    "light": { "primary": "#1d5c38", "primaryHover": "#2f7a4d", "tint": "#f1f7f2", "tint2": "#e3efe6", "text": "#12251a", "sub": "#587061", "faint": "#8aa093", "border": "#dbe7df", "codeBg": "#f5f9f6" },
+    "dark":  { "primary": "#7cc796", "primaryHover": "#9ad8ae", "bg": "#0c1a12", "surface": "#11241a", "tint": "#142b1e", "tint2": "#1c3a28", "text": "#e8f2eb", "sub": "#a3bbab", "faint": "#6f8a79", "border": "#234231", "codeBg": "#0f2117" }
+  },
+  "fair": { "depth": "catalog" },
+  "template": { "repository": "StaticFDP/fdp-ecosystem-template", "branch": "main" }
+}

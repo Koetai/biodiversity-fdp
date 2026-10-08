@@ -30,7 +30,9 @@ const CRAWL_LINKS = [NS.fdp + 'metadataCatalog', NS.dcat + 'catalog', NS.dcat + 
 const CRAWL_MAX_DOCS = 200;
 const FETCH_TIMEOUT_MS = 12000;
 
-const INDEX = new URLSearchParams(location.search).get('index') || 'fdp/biodiversity-index/catalog.ttl';
+// Instance settings, injected from fdp.config.json by scripts/build_static.py.
+const CFG = window.FDP_CONFIG || {};
+const INDEX = new URLSearchParams(location.search).get('index') || `fdp/${CFG.indexFolder || 'index'}/catalog.ttl`;
 const INDEX_IS_LOCAL = !/^https?:\/\//i.test(INDEX);
 
 const { namedNode } = N3.DataFactory;
@@ -56,8 +58,8 @@ const localName = iri => (iri || '').replace(/[\/#]$/, '').split(/[\/#]/).pop();
 // ── Loading ─────────────────────────────────────────────────────────────────
 
 function fetchLocation(iri) {
-  // In local mode the canonical (raw GitHub) IRIs are served from this site's root.
-  if (rawBase && iri.startsWith(rawBase)) return iri.slice(rawBase.length);
+  // In local mode the canonical IRIs are served from this site's fdp/ folder.
+  if (rawBase && iri.startsWith(rawBase)) return 'fdp/' + iri.slice(rawBase.length);
   return iri;
 }
 
@@ -108,17 +110,23 @@ async function init() {
   const root = roots[0];
   if (!root) throw new Error('No fdp:hasCatalog found in ' + INDEX);
 
-  // Canonical IRI of the index file, e.g. https://raw.githubusercontent.com/org/repo/main/fdp/…/catalog.ttl
+  // Canonical IRI of the index file, e.g. <baseIri><indexFolder>/catalog.ttl. Locally, everything under
+  // the canonical base is served from this site's fdp/ folder, whatever the base (GitHub raw, w3id, …).
   const canonicalIndex = root.endsWith('/') ? root + 'catalog.ttl' : root;
-  if (INDEX_IS_LOCAL && canonicalIndex.endsWith(INDEX)) {
-    rawBase = canonicalIndex.slice(0, -INDEX.length);
+  const localBase = INDEX_IS_LOCAL && canonicalIndex.endsWith(INDEX.replace(/^fdp\//, ''))
+    ? canonicalIndex.slice(0, -INDEX.replace(/^fdp\//, '').length) : null;
+  if (localBase) {
+    rawBase = localBase;
     // Re-key the already-loaded index under its canonical IRI so links and edits use it.
     sources.set(canonicalIndex, sources.get(indexIri));
     for (const q of store.getQuads(null, null, null, namedNode(indexIri)))
       store.addQuad(q.subject, q.predicate, q.object, namedNode(canonicalIndex));
   }
   const m = canonicalIndex.match(/^https:\/\/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)$/);
-  if (m) repo = { org: m[1], name: m[2], branch: m[3] };
+  if (INDEX_IS_LOCAL && CFG.repository) {
+    const [org, name] = CFG.repository.split('/');
+    repo = { org, name, branch: CFG.branch || 'main' };
+  } else if (m) repo = { org: m[1], name: m[2], branch: m[3] };
 
   indexModel = {
     iri: root, file: canonicalIndex,
@@ -318,11 +326,9 @@ function locate(target) {
 
 // ── Icons (monochrome, stroke = currentColor) ───────────────────────────────
 
-// A mangrove: lobed crown, arching prop roots standing in water (cf. the Mangal network).
-const LOGO = `<svg viewBox="0 0 24 24" aria-hidden="true">
-  <g fill="currentColor"><circle cx="7" cy="7.2" r="3.6"/><circle cx="12" cy="5.4" r="4.2"/><circle cx="17" cy="7.2" r="3.6"/><rect x="5" y="7" width="14" height="3.6" rx="1.8"/></g>
-  <path d="M12 10V20.5M12 11.8C8 11.8 4.6 14 3.2 20.5M12 11.8C16 11.8 19.4 14 20.8 20.5M11.6 13.4C9.4 14 7.6 16.4 7.2 20.5M12.4 13.4C14.6 14 16.4 16.4 16.8 20.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/>
-  <path d="M1 17.4H23V23H1Z" fill="currentColor" opacity=".18"/></svg>`;
+// The instance logo (theme.logo in fdp.config.json), inlined by the build so it follows the theme colour.
+const LOGO = (document.getElementById('fdp-logo') || {}).innerHTML ||
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="currentColor"/></svg>';
 
 const ICON_PATHS = {
   'web-portal': '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.5 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3z"/>',
@@ -450,8 +456,8 @@ function showIndex() {
 
   let html = `<div class="hero-band"><div class="wrap"><div class="hero">
       <div class="mark">${LOGO}</div>
-      <h1>Every way to get <em>biodiversity</em> data</h1>
-      <p>${catalogs.length} infrastructures and ${all.length} ways to reach them, from portals and APIs to SPARQL endpoints, bulk dumps and cloud buckets, described as one FAIR Data Point.</p>
+      <h1>${headlineHtml()}</h1>
+      <p>${catalogs.length} source${catalogs.length !== 1 ? 's' : ''} and ${all.length} way${all.length !== 1 ? 's' : ''} to reach ${catalogs.length !== 1 ? 'them' : 'it'}, from portals and APIs to SPARQL endpoints, bulk dumps and cloud buckets, described as one FAIR Data Point.</p>
       ${searchForm('', '', methods)}
     </div></div></div><div class="wrap">`;
 
@@ -488,6 +494,12 @@ function showIndex() {
   $('view').innerHTML = html;
   wireSearch();
   wireTurtle(indexModel.file);
+}
+
+// "Every way to get *biodiversity* data" → emphasis on the starred word(s).
+function headlineHtml() {
+  const text = CFG.headline || (indexModel && indexModel.title) || 'FAIR Data Point';
+  return esc(text).replace(/\*([^*]+)\*/g, '<em>$1</em>');
 }
 
 const shortTitle = t => (t || '').split(' — ')[0];

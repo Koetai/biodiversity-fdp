@@ -1,5 +1,1 @@
 blank_issues_enabled: true
-contact_links:
-  - name: How to add a data source by hand
-    url: https://github.com/Koetai/biodiversity-fdp/blob/main/CONTRIBUTING.md
-    about: Conventions, the JSON spec format and the access-method vocabulary.
