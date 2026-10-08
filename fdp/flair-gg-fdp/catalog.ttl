@@ -633,7 +633,7 @@
 
 # ── Publishers ──────────────────────────────────────────────────────────
 
-:publisher-flairgg  a foaf:Organization ; foaf:name "FLAIR-GG — CBGP (UPM-INIA/CSIC) and Universidad Politécnica de Madrid"@en ; foaf:homepage <https://wilkinsonlab.github.io/FLAIR-GG/> .
+:publisher-flairgg  a foaf:Organization ; foaf:name "FLAIR-GG — CBGP (UPM-CSIC) and Universidad Politécnica de Madrid"@en ; foaf:homepage <https://wilkinsonlab.github.io/FLAIR-GG/> .
 :publisher-bgv      a foaf:Organization ; foaf:name "Banco de Germoplasma Vegetal, Universidad Politécnica de Madrid (BGV-UPM)"@es ; foaf:homepage <http://www.bancodegermoplasma.upm.es/> .
 :publisher-bgusal   a foaf:Organization ; foaf:name "Banco de Germoplasma de la Universidad de Salamanca (BGUSAL)"@es ; foaf:homepage <https://bgusal.linkeddata.systems> .
 :publisher-jbclm    a foaf:Organization ; foaf:name "Jardín Botánico de Castilla-La Mancha (BG-JBCLM)"@es ; foaf:homepage <https://jbclm.linkeddata.systems> .
