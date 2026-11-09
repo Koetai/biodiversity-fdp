@@ -113,7 +113,7 @@
     dcat:accessURL <https://registry.opendata.aws/gbif/> ;
     dcat:downloadURL <https://gbif-open-data-eu-central-1.s3.eu-central-1.amazonaws.com/occurrence/2026-10-01/citation.txt> ;
     dcat:accessService :svc-gbif-s3-eu-central-1 , :svc-gbif-s3-us-east-1 , :svc-gbif-s3-af-south-1 , :svc-gbif-s3-ap-southeast-2 , :svc-gbif-s3-sa-east-1 ;
-    rdfs:seeAlso <https://github.com/gbif/occurrence/blob/master/aws-public-data.md> .
+    foaf:page <https://github.com/gbif/occurrence/blob/master/aws-public-data.md> .
 
 :gbif-snapshot-2026-09-01
     a dcat:Dataset ;

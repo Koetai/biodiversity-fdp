@@ -89,7 +89,7 @@
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     dcat:landingPage <https://koetai.semscape.org/u/0000-0001-9773-4008/bhl> ;
     prov:wasDerivedFrom :dist-bhl-datazip ;
-    rdfs:seeAlso <https://koetai.semscape.org/fdp/dataset/0000-0001-9773-4008/bhl> ;
+    foaf:isPrimaryTopicOf <https://koetai.semscape.org/fdp/dataset/0000-0001-9773-4008/bhl> ;
     dcat:distribution :dist-koetai-bhl-sparql , :dist-koetai-bhl-examples , :dist-koetai-bhl-shapes , :dist-koetai-bhl-sparqlist , :dist-koetai-bhl-void , :dist-bionames-bhl .
 
 :dist-koetai-bhl-sparql
@@ -142,7 +142,7 @@
     dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
     dcat:accessURL <https://koetai.bionames.org/u/0000-0002-7101-9767/bhl> ;
     dcat:accessService :svc-bionames-bhl ;
-    rdfs:seeAlso <https://koetai.semscape.org/mangal> .
+    dcterms:isPartOf <https://koetai.semscape.org/mangal> .
 
 # ── Dataset: BHL sample on Koetai ───────────────────────────────────────────
 

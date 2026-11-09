@@ -40,7 +40,7 @@
     dcterms:publisher :publisher-bgv ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://w3id.org/bgv-fdp> ;
-    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcterms:isReferencedBy <https://vp.bgv.cbgp.upm.es> ;
     dcat:distribution :dist-bgv-fdp , :dist-bgv-germplasm-sparql , :dist-bgv-location-sparql , :dist-bgv-admin-sparql , :dist-bgv-fdp-sparql , :dist-bgv-iucn , :dist-bgv-species-location .
 
 :dist-bgv-fdp
@@ -126,7 +126,7 @@
     dcterms:publisher :publisher-bgusal ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://bgusal.linkeddata.systems> ;
-    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcterms:isReferencedBy <https://vp.bgv.cbgp.upm.es> ;
     dcat:distribution :dist-bgusal-fdp , :dist-bgusal-germplasm-sparql , :dist-bgusal-location-sparql , :dist-bgusal-iucn , :dist-bgusal-species-location .
 
 :dist-bgusal-fdp
@@ -192,7 +192,7 @@
     dcterms:publisher :publisher-jbclm ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://jbclm.linkeddata.systems> ;
-    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcterms:isReferencedBy <https://vp.bgv.cbgp.upm.es> ;
     dcat:distribution :dist-jbclm-fdp , :dist-jbclm-germplasm-sparql , :dist-jbclm-location-sparql , :dist-jbclm-iucn , :dist-jbclm-species-location .
 
 :dist-jbclm-fdp
@@ -258,7 +258,7 @@
     dcterms:publisher :publisher-jbo ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://jbo.linkeddata.systems> ;
-    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcterms:isReferencedBy <https://vp.bgv.cbgp.upm.es> ;
     dcat:distribution :dist-jbo-fdp , :dist-jbo-germplasm-sparql , :dist-jbo-location-sparql , :dist-jbo-admin-sparql , :dist-jbo-iucn , :dist-jbo-species-location .
 
 :dist-jbo-fdp
@@ -334,7 +334,7 @@
     dcterms:publisher :publisher-jbs ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://jbs.linkeddata.systems> ;
-    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcterms:isReferencedBy <https://vp.bgv.cbgp.upm.es> ;
     dcat:distribution :dist-jbs-fdp , :dist-jbs-germplasm-sparql , :dist-jbs-location-sparql , :dist-jbs-iucn , :dist-jbs-species-location .
 
 :dist-jbs-fdp
@@ -400,7 +400,7 @@
     dcterms:publisher :publisher-urjc ;
     dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcat:landingPage <https://urjc.linkeddata.systems> ;
-    rdfs:seeAlso <https://vp.bgv.cbgp.upm.es> ;
+    dcterms:isReferencedBy <https://vp.bgv.cbgp.upm.es> ;
     dcat:distribution :dist-urjc-fdp , :dist-urjc-germplasm-sparql , :dist-urjc-location-sparql , :dist-urjc-admin-sparql , :dist-urjc-iucn , :dist-urjc-species-location .
 
 :dist-urjc-fdp
@@ -475,7 +475,7 @@
     dcat:version "live (described 2026-10-07)" ;
     dcterms:publisher :publisher-flairgg ;
     dcat:landingPage <https://wilkinsonlab.github.io/FLAIR-GG/VP/index.html> ;
-    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl> ;
+    dcterms:references <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl#catalog> ;
     dcat:distribution :dist-vp-portal , :dist-vp-index , :dist-vp-proxy , :dist-vp-driada , :dist-vp-ena , :dist-vp-swagger .
 
 :dist-vp-portal
@@ -622,7 +622,7 @@
     dcat:mediaType <https://www.iana.org/assignments/media-types/application/zip> ;
     dcterms:format ft:ZIP ;
     dcat:accessURL <https://doi.org/10.5281/zenodo.18007552> ;
-    rdfs:seeAlso <https://www.worldfloraonline.org/downloadData> .
+    dcterms:isReferencedBy <https://www.worldfloraonline.org/downloadData> .
 
 :dist-wfo-fdp
     a dcat:Distribution ;

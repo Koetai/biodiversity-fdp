@@ -111,7 +111,7 @@
     dcat:mediaType <https://www.iana.org/assignments/media-types/application/json> ;
     dcat:accessURL <https://www.gbif.org/publisher/7ce8aef0-9e92-11dc-8738-b8a03c50a862> ;
     dcat:accessService <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-api> ;
-    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
+    dcterms:references <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl#catalog> .
 
 :dist-tb-gbif-aws
     a dcat:Distribution ;

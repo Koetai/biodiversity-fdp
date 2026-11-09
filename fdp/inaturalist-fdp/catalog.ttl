@@ -90,7 +90,7 @@
     dcat:accessURL <https://registry.opendata.aws/inaturalist-open-data/> ;
     dcat:downloadURL <https://inaturalist-open-data.s3.amazonaws.com/metadata/inaturalist-open-data-latest.tar.gz> ;
     dcat:accessService :svc-inat-s3 ;
-    rdfs:seeAlso <https://github.com/inaturalist/inaturalist-open-data> .
+    foaf:page <https://github.com/inaturalist/inaturalist-open-data> .
 
 :dist-obs-dwca
     a dcat:Distribution ;
@@ -115,7 +115,7 @@
     dcat:accessURL <https://www.gbif.org/dataset/50c9509d-22c7-4a22-a47d-8c48425ef4a7> ;
     dcat:accessService <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/svc-gbif-api> ;
     prov:wasDerivedFrom :dist-obs-dwca ;
-    rdfs:seeAlso <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl> .
+    dcterms:references <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl#catalog> .
 
 :dist-obs-gbif-aws
     a dcat:Distribution ;

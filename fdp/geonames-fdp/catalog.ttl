@@ -98,7 +98,7 @@
 #     dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
 #     dcat:accessURL <https://koetai.semscape.org/u/ORCID/DATASET/sparql> ;
 #     prov:wasDerivedFrom :dist-dump ;
-#     rdfs:seeAlso <https://koetai.semscape.org/mangal> .
+#     dcterms:isPartOf <https://koetai.semscape.org/mangal> .
 
 :svc-ws
     a dcat:DataService ;
