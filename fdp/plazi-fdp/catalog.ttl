@@ -7,7 +7,7 @@
 @prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
 @prefix r3d:     <http://www.re3data.org/schema/3-0#> .
 @prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
-@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods.ttl#> .
 @prefix :        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/> .
 
 <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/>
@@ -15,9 +15,9 @@
     dcterms:title "Plazi FAIR Data Point — Biodiversity FDP"@en ;
     dcterms:publisher :publisher-curator ;
     dcterms:modified "2026-10-06"^^xsd:date ;
-    fdp:hasCatalog :catalog .
+    fdp:hasCatalog <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/catalog.ttl#catalog> .
 
-:catalog
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/catalog.ttl#catalog>
     a dcat:Catalog ;
     dcterms:title "Plazi — TreatmentBank and the Biodiversity Literature Repository"@en ;
     dcterms:description "Taxonomic treatments, material citations, figures and bibliographic data liberated from published literature. Plazi publishes the same content through many channels: TreatmentBank, its APIs, XML and RDF in git, a SPARQL endpoint, Synospecies, GBIF and Zenodo."@en ;

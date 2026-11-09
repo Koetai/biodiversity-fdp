@@ -6,9 +6,10 @@ Each catalog describes one resource and every way to obtain it: portals, APIs, S
 
 ## Make it yours
 
-- **`fdp.config.json`** holds the name, headline, description, colours, fonts, logo, maintainer and IRIs.
+- **`fdp.config.json`** holds the name, headline, description, maintainer and IRIs, and the house style under `theme`: colours, fonts, corners, logo and extra links.
+- **`assets/house-style.css`** is your own CSS. It loads last, so it can change anything the theme does not cover.
 - **`fdp/`** holds the catalogs. The example catalog can be replaced; add sources with the [issue form](../../issues/new?template=add-data-source.yml) or see [CONTRIBUTING.md](CONTRIBUTING.md).
-- **`assets/logo.svg`** is the logo, used in the site and as the favicon.
+- **`assets/logo.svg`** is the logo, used in the site and as the favicon (PNG, JPEG or WebP also work; set `theme.logo`).
 
 ## How it works
 

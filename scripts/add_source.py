@@ -66,6 +66,11 @@ def access_methods():
     return re.findall(r"^am:([a-z-]+)\s+a skos:Concept\s*;", VOCAB.read_text(), re.M)
 
 
+def access_method_namespace():
+    """The namespace the vocabulary itself declares, so new catalogs always match it."""
+    return re.search(r"^@prefix am:\s*<([^>]+)>", VOCAB.read_text(), re.M).group(1)
+
+
 def base_iri():
     return BASE_IRI
 
@@ -151,7 +156,7 @@ def catalog_ttl(s, base, today):
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
 @prefix r3d:     <http://www.re3data.org/schema/3-0#> .
-@prefix am:      <{base}vocab/access-methods#> .
+@prefix am:      <{access_method_namespace()}> .
 @prefix :        <{base}{folder}/> .
 
 <{base}{folder}/>
@@ -159,11 +164,11 @@ def catalog_ttl(s, base, today):
     dcterms:title {lit(s['title'] + ' FAIR Data Point — ' + NAME)} ;
     dcterms:publisher :publisher-source ;
     dcterms:modified "{today}"^^xsd:date ;
-    fdp:hasCatalog :catalog .
+    fdp:hasCatalog <{base}{folder}/catalog.ttl#catalog> .
 """]
     used = set()
     ds_ids = [local_id(ds.get("version") and f"{s['slug']}-{ds['version']}" or ds["title"], used) for ds in s["datasets"]]
-    cat = [":catalog", "    a dcat:Catalog ;", f"    dcterms:title {lit(s['title'])} ;"]
+    cat = [f"<{base}{folder}/catalog.ttl#catalog>", "    a dcat:Catalog ;", f"    dcterms:title {lit(s['title'])} ;"]
     if s.get("description"):
         cat.append(f"    dcterms:description {lit(s['description'])} ;")
     cat.append("    dcterms:publisher :publisher-source ;")
@@ -227,25 +232,28 @@ def catalog_ttl(s, base, today):
 def register_in_index(s, base, today):
     text = INDEX.read_text()
     entry = f"catalog-{s['slug']}"
-    if re.search(rf"^:{re.escape(entry)}\b", text, re.M):
-        raise SpecError(f"the index already has an entry :{entry}")
-    target = s["fdpUrl"] if s["mode"] == "live" else f"{base}{s['slug']}-fdp/catalog.ttl"
-    # Append to the fdp:hasCatalog list (its last item ends with " .").
-    m = re.search(r"(fdp:hasCatalog\b[^.]*?)(\s*\.)", text, re.S)
+    live = s["mode"] == "live"
+    target = s["fdpUrl"] if live else f"{base}{s['slug']}-fdp/catalog.ttl"
+    if re.search(rf"^:{re.escape(entry)}\b", text, re.M) or f"<{target}#catalog>" in text:
+        raise SpecError(f"the index already has an entry for {s['slug']}")
+    # Append to the fdp:hasCatalog list (its last item ends with " ."; IRIs may contain dots).
+    # A curated catalog is named by a hash IRI in its own document; a live FDP gets an entry here.
+    m = re.search(r"(fdp:hasCatalog\b(?:<[^>]*>|[^.<])*?)(\s*\.)", text, re.S)
     if not m:
         raise SystemExit("Could not find fdp:hasCatalog in the index")
-    text = text[:m.end(1)] + f" ,\n        :{entry}" + text[m.end(1):]
+    text = text[:m.end(1)] + (f" ,\n        :{entry}" if live else f" ,\n        <{target}#catalog>") + text[m.end(1):]
     # Keep ldp:contains (the catalog documents) in step with fdp:hasCatalog.
     m = re.search(r"(ldp:contains\b[^;]*?)(\s*;)", text, re.S)
     if m:
         text = text[:m.end(1)] + f" ,\n        <{target}>" + text[m.end(1):]
-    block = [f":{entry}", "    a dcat:Catalog ;", f"    dcterms:title {lit(s['title'])} ;"]
-    if s.get("license"):
-        block.append(f"    dcterms:license <{s['license']}> ;")
-    block.append(f"    rdfs:seeAlso <{target}> .")
-    block = "\n".join(block) + "\n\n"
-    m = re.search(r"^:publisher-curator\b", text, re.M)
-    text = text[:m.start()] + block + text[m.start():] if m else text.rstrip("\n") + "\n\n" + block
+    if live:
+        block = [f":{entry}", "    a dcat:Catalog ;", f"    dcterms:title {lit(s['title'])} ;"]
+        if s.get("license"):
+            block.append(f"    dcterms:license <{s['license']}> ;")
+        block.append(f"    dcterms:source <{target}> .")
+        block = "\n".join(block) + "\n\n"
+        m = re.search(r"^:publisher-curator\b", text, re.M)
+        text = text[:m.start()] + block + text[m.start():] if m else text.rstrip("\n") + "\n\n" + block
     text = re.sub(r'(dcterms:modified ")\d{4}-\d{2}-\d{2}("\^\^xsd:date)', rf"\g<1>{today}\g<2>", text, count=1)
     INDEX.write_text(text)
 

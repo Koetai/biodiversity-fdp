@@ -7,7 +7,7 @@
 @prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
 @prefix r3d:     <http://www.re3data.org/schema/3-0#> .
 @prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
-@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods.ttl#> .
 @prefix :        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/> .
 
 <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/>
@@ -15,15 +15,16 @@
     dcterms:title "iNaturalist FAIR Data Point — Biodiversity FDP"@en ;
     dcterms:publisher :publisher-curator ;
     dcterms:modified "2026-10-06"^^xsd:date ;
-    fdp:hasCatalog :catalog .
+    fdp:hasCatalog <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog.ttl#catalog> .
 
-:catalog
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog.ttl#catalog>
     a dcat:Catalog ;
+    dcterms:license <https://creativecommons.org/licenses/by-nc/4.0/> ;
     dcterms:title "iNaturalist — citizen-science biodiversity observations"@en ;
     dcterms:description "Community-sourced, photo-vouchered observations of organisms and the iNaturalist taxonomy. Native access on inaturalist.org, plus the research-grade subset republished through GBIF (portal, API, AWS Parquet snapshots and the QLever RDF graph)."@en ;
     dcterms:publisher :publisher-inat ;
     dcat:landingPage <https://www.inaturalist.org> ;
-    dcat:themeTaxonomy <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods#scheme> ;
+    dcat:themeTaxonomy <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods.ttl#scheme> ;
     dcat:keyword "citizen science"@en , "occurrence"@en , "observation"@en , "taxonomy"@en ;
     dcat:dataset :inat-observations , :inat-taxonomy .
 

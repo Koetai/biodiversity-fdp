@@ -11,29 +11,29 @@
 <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/biodiversity-index/>
     dcterms:contributor :contributor-andrawaag , :contributor-markwilkinson .
 
-<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/catalog>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/catalog.ttl#catalog>
     dcterms:creator :contributor-andrawaag .
 
-<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/catalog>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/catalog.ttl#catalog>
     dcterms:creator :contributor-andrawaag ;
     dcterms:contributor :contributor-markwilkinson .
 
-<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/gbif-fdp/catalog.ttl#catalog>
     dcterms:creator :contributor-andrawaag .
 
-<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl#catalog>
     dcterms:creator :contributor-andrawaag .
 
-<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog.ttl#catalog>
     dcterms:creator :contributor-andrawaag .
 
-<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/openstreetmap-fdp/catalog>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/openstreetmap-fdp/catalog.ttl#catalog>
     dcterms:creator :contributor-andrawaag .
 
-<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/catalog>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/catalog.ttl#catalog>
     dcterms:creator :contributor-andrawaag .
 
-<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog>
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl#catalog>
     dcterms:creator :contributor-andrawaag .
 
 :contributor-andrawaag

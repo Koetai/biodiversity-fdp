@@ -35,23 +35,35 @@ for s, o in merged.subject_objects(DCAT.accessService):
     if (o, RDF.type, DCAT.DataService) not in merged:
         errors.append(f"{s}: dangling accessService {o}")
 
-# Index entries pointing into this repository must have a matching file.
 RDFS_SEEALSO = Namespace("http://www.w3.org/2000/01/rdf-schema#").seeAlso
 FDPO = Namespace("https://w3id.org/fdp/fdp-o#")
-for cat in merged.objects(None, FDPO.hasCatalog):
-    for target in merged.objects(cat, RDFS_SEEALSO):
-        t = str(target)
-        if t.startswith(BASE_IRI) and t.endswith(".ttl"):
-            local = "fdp/" + t[len(BASE_IRI):]
-            if not glob.glob(local):
-                errors.append(f"{cat}: rdfs:seeAlso points at {local}, which does not exist")
+
+
+def catalog_document(cat):
+    """The document behind an fdp:hasCatalog entry: a hash IRI names it, a live entry has dcterms:source.
+    Indexes that scripts/migrate_seealso.py has not converted yet still use rdfs:seeAlso."""
+    if "#" in cat:
+        return str(cat).split("#")[0]
+    target = merged.value(cat, DCT.source) or merged.value(cat, RDFS_SEEALSO)
+    return str(target) if target else None
+
+
+# Index entries pointing into this repository must have a matching file that describes the catalog.
+for cat in set(merged.objects(None, FDPO.hasCatalog)):
+    t = catalog_document(cat)
+    if t and t.startswith(BASE_IRI) and t.endswith(".ttl"):
+        local = "fdp/" + t[len(BASE_IRI):]
+        if not glob.glob(local):
+            errors.append(f"{cat}: fdp:hasCatalog points at {local}, which does not exist")
+    if "#" in cat and (cat, RDF.type, DCAT.Catalog) not in merged:
+        errors.append(f"{cat}: no dcat:Catalog with this IRI in its document")
 
 # ldp:contains on the index must list exactly the documents its fdp:hasCatalog entries point at.
 LDP = Namespace("http://www.w3.org/ns/ldp#")
 for root in set(merged.subjects(FDPO.hasCatalog, None)):
     contained = {str(o) for o in merged.objects(root, LDP.contains)}
     if contained:
-        expected = {str(t) for c in merged.objects(root, FDPO.hasCatalog) for t in merged.objects(c, RDFS_SEEALSO)}
+        expected = {catalog_document(c) for c in merged.objects(root, FDPO.hasCatalog)} - {None}
         for x in sorted(expected - contained):
             errors.append(f"{root}: ldp:contains is missing {x}")
         for x in sorted(contained - expected):
@@ -69,7 +81,34 @@ for t in {str(x) for triple in merged for x in triple[1:]}:
             except AttributeError:
                 errors.append(f"{t} is not defined in {base}")
 
+# ShEx: every FDP root, catalog, dataset, distribution and data service must match its shape in
+# scripts/shapes/fdp-ecosystem.shex (ported from LeanFDP/static-fdp). Needs PyShEx (pip install pyshex).
+SHAPES = Namespace("https://github.com/LeanFDP/fdp-ecosystem-template/blob/main/scripts/shapes/fdp-ecosystem.shex#")
+try:
+    from pyshex import ShExEvaluator
+except ImportError:
+    ShExEvaluator = None
+    print("\nShEx skipped: install PyShEx (pip install pyshex) to check the shapes")
+if ShExEvaluator:
+    schema = (Path(__file__).resolve().parent / "shapes" / "fdp-ecosystem.shex").read_text()
+    targets = [(FDP.MetadataService, "MetadataService"), (DCAT.Catalog, "Catalog"), (DCAT.Dataset, "Dataset"),
+               (DCAT.Distribution, "Distribution"), (DCAT.DataService, "DataService")]
+    checked = 0
+    for cls, shape in targets:
+        focus = sorted(str(s) for s in set(merged.subjects(RDF.type, cls)))
+        if not focus:
+            continue
+        for r in ShExEvaluator(rdf=merged, schema=schema, focus=focus, start=str(SHAPES[shape])).evaluate():
+            checked += 1
+            if not r.result:
+                reason = " ".join((r.reason or "").split())
+                errors.append(f"{r.focus}: does not match ShEx shape {shape}: {reason[:300]}")
+    print(f"\nShEx: checked {checked} nodes against scripts/shapes/fdp-ecosystem.shex")
+
 n = lambda t: len(set(merged.subjects(RDF.type, t)))
 print(f"\n{n(DCAT.Catalog)} catalogs, {n(DCAT.Dataset)} datasets, {n(DCAT.Distribution)} distributions, {n(DCAT.DataService)} services")
+seealso = len(list(merged.subject_objects(RDFS_SEEALSO)))
+if seealso:
+    print(f"\nwarning: {seealso} rdfs:seeAlso statement(s); run python3 scripts/migrate_seealso.py to replace them")
 print("\n".join(errors) or "no problems found")
 sys.exit(1 if errors else 0)
