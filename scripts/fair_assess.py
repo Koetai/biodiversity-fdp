@@ -110,6 +110,7 @@ class Walker:
 
     def fetch(self, url):
         """Fetch RDF at url (following describedby from HTML). Returns (graph, doc_url) or (None, reason)."""
+        url = url.split("#")[0]
         resp = curl(url)
         if not resp:
             return None, "no response"
@@ -185,7 +186,7 @@ class Walker:
         queue = deque([(root, 0)])
         while queue:
             s, depth = queue.popleft()
-            # Our own index lists the catalog documents with ldp:contains and stubs with fdp:hasCatalog;
+            # Our own index lists the catalog documents with ldp:contains and the catalogs with fdp:hasCatalog;
             # when a node has ldp:contains, follow only that to avoid visiting each catalog twice.
             preds = [LDP.contains] if (s, LDP.contains, None) in self.g else LINKS
             children = [o for p in preds for o in self.g.objects(s, p) if isinstance(o, URIRef)]

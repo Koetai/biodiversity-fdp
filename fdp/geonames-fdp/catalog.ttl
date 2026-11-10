@@ -7,7 +7,7 @@
 @prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
 @prefix r3d:     <http://www.re3data.org/schema/3-0#> .
 @prefix ft:      <http://publications.europa.eu/resource/authority/file-type/> .
-@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods#> .
+@prefix am:      <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/vocab/access-methods.ttl#> .
 @prefix :        <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/> .
 
 <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/>
@@ -15,9 +15,9 @@
     dcterms:title "GeoNames FAIR Data Point — Biodiversity FDP"@en ;
     dcterms:publisher :publisher-curator ;
     dcterms:modified "2026-10-06"^^xsd:date ;
-    fdp:hasCatalog :catalog .
+    fdp:hasCatalog <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl#catalog> .
 
-:catalog
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl#catalog>
     a dcat:Catalog ;
     dcterms:title "GeoNames — geographical names gazetteer"@en ;
     dcterms:description "Over 12 million place names with coordinates, feature classes and administrative hierarchy; the usual way to resolve locality strings and country/admin codes in occurrence data."@en ;
@@ -98,7 +98,7 @@
 #     dcat:mediaType <https://www.iana.org/assignments/media-types/application/sparql-results+json> ;
 #     dcat:accessURL <https://koetai.semscape.org/u/ORCID/DATASET/sparql> ;
 #     prov:wasDerivedFrom :dist-dump ;
-#     rdfs:seeAlso <https://koetai.semscape.org/mangal> .
+#     dcterms:isPartOf <https://koetai.semscape.org/mangal> .
 
 :svc-ws
     a dcat:DataService ;
