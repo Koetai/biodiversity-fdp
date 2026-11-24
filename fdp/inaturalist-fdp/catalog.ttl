@@ -199,3 +199,8 @@
 :publisher-inat     a foaf:Organization ; foaf:name "iNaturalist"@en ; foaf:homepage <https://www.inaturalist.org> .
 :publisher-aws      a foaf:Organization ; foaf:name "Amazon Web Services — Open Data Sponsorship Program"@en ; foaf:homepage <https://aws.amazon.com/opendata/> .
 :publisher-curator  a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .
+
+# Identifiers that FAIR tests look for: the canonical IRI and the address on the website.
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/" , "https://koetai.github.io/biodiversity-fdp/fdp/inaturalist-fdp/catalog.ttl" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog.ttl#catalog> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog.ttl#catalog" , "https://koetai.github.io/biodiversity-fdp/fdp/inaturalist-fdp/catalog.ttl#catalog" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/catalog.ttl> foaf:primaryTopic <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/inaturalist-fdp/> .

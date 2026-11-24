@@ -142,3 +142,11 @@ python3 scripts/validate.py
 ```
 
 It gives catalogs and access-method terms hash IRIs, drops the stubs on the index, uses `dcterms:source` for live FDPs and `dcterms:hasPart` for contributors. Any other `rdfs:seeAlso` was written by a curator, so the script lists it and leaves it: replace it with a predicate that says what the link is, such as `dcterms:references`.
+
+## FAIR test identifiers
+
+The FAIR assessment tests each FDP and catalog at its address on the website. The F3 tests pass only if the metadata names that exact address with `dcterms:identifier`, and links the record to what it describes (`foaf:primaryTopic`). `scripts/add_source.py` writes both for new sources. For catalogs added earlier, `scripts/validate.py` warns, and this adds them:
+
+```bash
+python3 scripts/add_identifiers.py
+```

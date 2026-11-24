@@ -28,6 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from fdpconfig import BASE_IRI, INDEX_FILE as INDEX, INDEX_FOLDER, NAME, ROOT  # noqa: E402
+from add_identifiers import website_address  # noqa: E402
 
 VOCAB = ROOT / "fdp" / "vocab" / "access-methods.ttl"
 IANA = "https://www.iana.org/assignments/media-types/"
@@ -162,13 +163,18 @@ def catalog_ttl(s, base, today):
 <{base}{folder}/>
     a fdp:MetadataService, r3d:Repository ;
     dcterms:title {lit(s['title'] + ' FAIR Data Point — ' + NAME)} ;
+    # Both addresses identify it: the canonical IRI and the website that serves it (FAIR tests use the latter).
+    dcterms:identifier "{base}{folder}/" , "{website_address(f"{base}{folder}/catalog.ttl")}" ;
     dcterms:publisher :publisher-source ;
     dcterms:modified "{today}"^^xsd:date ;
     fdp:hasCatalog <{base}{folder}/catalog.ttl#catalog> .
+
+<{base}{folder}/catalog.ttl> foaf:primaryTopic <{base}{folder}/> .
 """]
     used = set()
     ds_ids = [local_id(ds.get("version") and f"{s['slug']}-{ds['version']}" or ds["title"], used) for ds in s["datasets"]]
-    cat = [f"<{base}{folder}/catalog.ttl#catalog>", "    a dcat:Catalog ;", f"    dcterms:title {lit(s['title'])} ;"]
+    cat = [f"<{base}{folder}/catalog.ttl#catalog>", "    a dcat:Catalog ;", f"    dcterms:title {lit(s['title'])} ;",
+           f'    dcterms:identifier "{base}{folder}/catalog.ttl#catalog" , "{website_address(f"{base}{folder}/catalog.ttl#catalog")}" ;']
     if s.get("description"):
         cat.append(f"    dcterms:description {lit(s['description'])} ;")
     cat.append("    dcterms:publisher :publisher-source ;")
