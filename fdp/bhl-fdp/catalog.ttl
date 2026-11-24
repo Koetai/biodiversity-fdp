@@ -193,3 +193,8 @@
 :publisher-bhl      a foaf:Organization ; foaf:name "Biodiversity Heritage Library"@en ; foaf:homepage <https://www.biodiversitylibrary.org> .
 :publisher-koetai   a foaf:Organization ; foaf:name "Koetai FAIR SPARQL Platform"@en ; foaf:homepage <https://koetai.semscape.org> .
 :publisher-curator  a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .
+
+# Identifiers that FAIR tests look for: the canonical IRI and the address on the website.
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/" , "https://koetai.github.io/biodiversity-fdp/fdp/bhl-fdp/catalog.ttl" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/catalog.ttl#catalog> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/catalog.ttl#catalog" , "https://koetai.github.io/biodiversity-fdp/fdp/bhl-fdp/catalog.ttl#catalog" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/catalog.ttl> foaf:primaryTopic <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/bhl-fdp/> .

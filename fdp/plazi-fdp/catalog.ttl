@@ -187,3 +187,8 @@
 :publisher-plazi    a foaf:Organization ; foaf:name "Plazi"@en ; foaf:homepage <https://plazi.org> .
 :publisher-zenodo   a foaf:Organization ; foaf:name "Zenodo (CERN)"@en ; foaf:homepage <https://zenodo.org> .
 :publisher-curator  a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .
+
+# Identifiers that FAIR tests look for: the canonical IRI and the address on the website.
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/" , "https://koetai.github.io/biodiversity-fdp/fdp/plazi-fdp/catalog.ttl" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/catalog.ttl#catalog> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/catalog.ttl#catalog" , "https://koetai.github.io/biodiversity-fdp/fdp/plazi-fdp/catalog.ttl#catalog" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/catalog.ttl> foaf:primaryTopic <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/plazi-fdp/> .

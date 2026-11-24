@@ -644,3 +644,8 @@
 :publisher-wfo      a foaf:Organization ; foaf:name "World Flora Online Consortium"@en ; foaf:homepage <https://www.worldfloraonline.org> .
 :publisher-dbcls    a foaf:Organization ; foaf:name "Database Center for Life Science (DBCLS)"@en ; foaf:homepage <https://dbcls.rois.ac.jp> .
 :publisher-curator  a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .
+
+# Identifiers that FAIR tests look for: the canonical IRI and the address on the website.
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/" , "https://koetai.github.io/biodiversity-fdp/fdp/flair-gg-fdp/catalog.ttl" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/catalog.ttl#catalog> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/catalog.ttl#catalog" , "https://koetai.github.io/biodiversity-fdp/fdp/flair-gg-fdp/catalog.ttl#catalog" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/catalog.ttl> foaf:primaryTopic <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/flair-gg-fdp/> .

@@ -107,6 +107,10 @@ if ShExEvaluator:
 
 n = lambda t: len(set(merged.subjects(RDF.type, t)))
 print(f"\n{n(DCAT.Catalog)} catalogs, {n(DCAT.Dataset)} datasets, {n(DCAT.Distribution)} distributions, {n(DCAT.DataService)} services")
+from add_identifiers import catalog_documents, missing  # noqa: E402
+lacking = [p for p in catalog_documents() if missing(p)]
+if lacking:
+    print(f"\nwarning: {len(lacking)} catalog document(s) lack the identifiers FAIR tests look for; run python3 scripts/add_identifiers.py")
 seealso = len(list(merged.subject_objects(RDFS_SEEALSO)))
 if seealso:
     print(f"\nwarning: {seealso} rdfs:seeAlso statement(s); run python3 scripts/migrate_seealso.py to replace them")

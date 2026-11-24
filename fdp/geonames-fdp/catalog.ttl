@@ -109,3 +109,8 @@
 
 :publisher-geonames  a foaf:Organization ; foaf:name "GeoNames"@en ; foaf:homepage <https://www.geonames.org> .
 :publisher-curator   a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .
+
+# Identifiers that FAIR tests look for: the canonical IRI and the address on the website.
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/" , "https://koetai.github.io/biodiversity-fdp/fdp/geonames-fdp/catalog.ttl" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl#catalog> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl#catalog" , "https://koetai.github.io/biodiversity-fdp/fdp/geonames-fdp/catalog.ttl#catalog" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/catalog.ttl> foaf:primaryTopic <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/geonames-fdp/> .

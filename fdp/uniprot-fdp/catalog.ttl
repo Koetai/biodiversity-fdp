@@ -146,3 +146,8 @@
 :publisher-uniprot   a foaf:Organization ; foaf:name "UniProt Consortium (EMBL-EBI, SIB, PIR)"@en ; foaf:homepage <https://www.uniprot.org> .
 :publisher-freiburg  a foaf:Organization ; foaf:name "University of Freiburg — Chair of Algorithms and Data Structures (QLever)"@en ; foaf:homepage <https://ad.informatik.uni-freiburg.de> .
 :publisher-curator   a foaf:Person ; foaf:name "Andra Waagmeester" ; foaf:homepage <https://orcid.org/0000-0001-9773-4008> .
+
+# Identifiers that FAIR tests look for: the canonical IRI and the address on the website.
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/" , "https://koetai.github.io/biodiversity-fdp/fdp/uniprot-fdp/catalog.ttl" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl#catalog> dcterms:identifier "https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl#catalog" , "https://koetai.github.io/biodiversity-fdp/fdp/uniprot-fdp/catalog.ttl#catalog" .
+<https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/catalog.ttl> foaf:primaryTopic <https://raw.githubusercontent.com/Koetai/biodiversity-fdp/main/fdp/uniprot-fdp/> .
